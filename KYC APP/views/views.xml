@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_partner_off_form_inherit" model="ir.ui.view">
+            <field name="name">res.partner.off.form.inherit</field>
+            <field name="model">res.partner</field>    
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet/group/group[1]" position="inside">
+                        <field name="vat" invisible="1"/>
+                        <field name="customer_name"/>
+                        <field name="cnic_number"/>
+                        <field name="gender"/>
+                        <field name="mailing_address"/>
+                        <field name="permanent_address"/>
+                        <field name="city"/>
+                        <field name="province"/>
+                </xpath>
+                <xpath expr="/form/sheet/group" position="inside">
+                    <group>
+                        <field name="father_name"/>
+                        <field name="cnic_expiry_date"/>
+                        <field name="mobile" widget="phone"/>
+                        <field name="date_of_birth"/>
+                        <field name="birth_place"/>
+                    </group>
+                </xpath>
+                <xpath expr="/form/sheet/notebook/page[1]" position="inside">
+                    <group>
+                        <group>
+                            <field name="nature_of_business"/>
+                            <field name="requestor_income"/>
+                            <field name="no_of_years"/>
+                        </group>
+                        <group>
+                            <field name="company_name"/>
+                            <field name="company_address"/>
+                        </group>
+                    </group>
+                </xpath>
+                <xpath expr="/form/sheet/notebook" position="inside">
+                <page name="digital_doc" string="Digital Document">
+                        <field name="cnic_front" widget='image' />
+                        <field name="cnic_back" widget='image' />
+                        <field name="security_cheque" widget='image' />
+                </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
