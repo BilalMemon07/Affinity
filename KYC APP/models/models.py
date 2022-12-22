@@ -25,5 +25,6 @@ class Partner(models.Model):
     cnic_front = fields.Binary(string="CNIC Front" , required=True)
     cnic_back = fields.Binary(string="CNIC Back" , required=True)
     security_cheque = fields.Binary(string="Security Cheque", required=True)
+    customer_image = fields.Binary(string="Customer Image", required=True)
     
 

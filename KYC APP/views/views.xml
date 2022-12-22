@@ -46,6 +46,7 @@
 								<field name="cnic_back" widget="image" string="CNIC Back" />
 							</group>
 							<group>
+								<field name="customer_image" widget="image" string="customer_image" />
 								<field name="security_cheque" widget="image" string="Security Cheque" />
 							</group>
 						</group>
