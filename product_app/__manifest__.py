@@ -1,23 +1,17 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "KYC APP",
-
-    'summary': """""",
-
-    'description': """
-        Know Your Customer.
-    """,
-
+    'name': "Product APP",
+    'summary': """Customer Product for CRM""",
+    'description': """""",
     'author': "Bilal Memon",
     'website': "",
     'category': 'Specific Industry Applications',
     'version': '0.1',
-    'depends': ['base'],
+    'depends': [],
     'data': [
         # 'security/ir.model.access.csv',
-        'views/views.xml',
+        # 'views/views.xml',
     ],
-    'license': 'AGPL-3',
     'license': 'AGPL-3',
     'installable': True,
     'application': True,
