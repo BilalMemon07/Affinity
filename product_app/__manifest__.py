@@ -7,10 +7,10 @@
     'website': "",
     'category': 'Specific Industry Applications',
     'version': '0.1',
-    'depends': [],
+    'depends': ['crm'],
     'data': [
         # 'security/ir.model.access.csv',
-        # 'views/views.xml',
+        'views/views.xml',
     ],
     'license': 'AGPL-3',
     'installable': True,

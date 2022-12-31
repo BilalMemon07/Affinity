@@ -6,9 +6,52 @@
 			<field name="model">crm.lead</field>
 			<field name="inherit_id" ref="crm.crm_lead_view_form" />
 			<field name="arch" type="xml">
-				<field name="partner_id" position="before">
+				<field name="partner_id" position="after">
 					<field name="product_type"/>
 				</field>
+				<xpath expr="/form/sheet/notebook" position="inside">
+					<page name="product_info" string="product Info">
+						<group attrs="{'invisible':[('product_type','!=', '1')]}">
+							<group>
+								<field name="limit_request" />
+								<field name="requested_amount"  />
+								<field name="instrument_number"  />
+								<field name="attachment" widget="image" string="CNIC Front"/>
+							</group>
+							<group>
+								<field name="instrument_number" />
+								<field name="facility_request_date" />
+								<field name="instrument_due_date" />
+							</group>
+						</group>
+						<group attrs="{'invisible':[('product_type','!=', '2')]}">
+							<group>
+								<field name="requested_amount"  />
+								<field name="instrument_number"  />
+								<field name="attachment" widget="image" string="CNIC Front"/>
+							</group>
+							<group>
+								<field name="instrument_number" />
+								<field name="facility_request_date" />
+								<field name="instrument_due_date" />
+							</group>
+						</group>
+						<group attrs="{'invisible':[('product_type','!=', '3')]}">
+							<group>
+								<field name="select_party"  />
+								<field name="invoice_amount"  />
+								<field name="tag_trip"  />
+								<field name="invoice_attachment" widget="image" string="CNIC Front"/>
+							</group>
+							<group>
+								<field name="invoice_type" />
+								<field name="facility_request_date" />
+								<field name="instrument_due_date" />
+								<field name="description" />
+							</group>
+						</group>
+					</page>
+				</xpath>
 			</field>
 		</record>
 	</data>
