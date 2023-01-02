@@ -154,11 +154,104 @@ def updatesalesorder(id):
         return Response('Sorry, something went wrong!' + ' ' + str(ex), status=400, mimetype='application/json')
 
 
+@app.route(url_prefix + 'createProduct', methods=['POST'])
+def CreateCRM_product():
+    product_type = request.args.get('product_type')
+    record = json.loads(request.data)
+    try:
+        global authToken
+        res = authentication(authToken)
+        if res == True:
+            if product_type == "1":
+                id = models.execute_kw(login_data['db'], uid, login_data['dbpassword'], 'crm.lead', 'create', [{
+                    "name":record['name'],
+                    "partner_id" : record['partner_id'],
+                    "product_type":product_type,
+                    "limit_request":record['limit_request'],
+                    "requested_amount":record['requested_amount'],
+                    "instrument_number":record['instrument_number'],
+                    "facility_request_date":record['facility_request_date'],
+                    "instrument_due_date":record['instrument_due_date'],
+                    "attachment" : record['attachment'],
+                }])
+                res_message ={
+                    "Message" : "Product Created Successfully",
+                    "id" : "Prodcut Created Id is" + " " + str(id)
+                }
+                return res_message
+            elif product_type == "2":
+                id = models.execute_kw(login_data['db'], uid, login_data['dbpassword'], 'crm.lead', 'create', [{
+                    "name":record['name'],
+                    "partner_id" : record['partner_id'],
+                    "product_type":product_type,
+                    "requested_amount":record['requested_amount'],
+                    "instrument_number":record['instrument_number'],
+                    "facility_request_date":record['facility_request_date'],
+                    "instrument_due_date":record['instrument_due_date'],
+                    "attachment" : record['attachment'],
+                }])
+                res_message ={
+                    "Message" : "Product Created Successfully",
+                    "id" : "Prodcut Created Id is" + " " + str(id)
+                }
+                return res_message
+            elif product_type == "3":
+                id = models.execute_kw(login_data['db'], uid, login_data['dbpassword'], 'crm.lead', 'create', [{
+                    "name":record['name'],
+                    "partner_id" : record['partner_id'],
+                    "product_type":product_type,
+                    "facility_request_date":record['facility_request_date'],
+                    "instrument_due_date": record['instrument_due_date'],
+                    "select_party": record['select_party'],
+                    "invoice_amount":record['invoice_amount'],
+                    "tag_trip":record['tag_trip'],
+                    "invoice_type":record['invoice_type'],
+                    "description":record['description'],
+                    "invoice_attachment":record['invoice_attachment']
+                }])
+                res_message ={
+                    "Message" : "Product Created Successfully",
+                    "id" : "Prodcut Created Id is" + " " + str(id)
+                }
+                return res_message
+            else:
+                return "Prduct type is not Exist"
+    
+    except Exception as ex:
+        print('Sorry, something went wrong!')
+        return Response('Sorry, something went wrong!' + ' ' + str(ex), status=400, mimetype='application/json')
+
+
+@app.route(url_prefix + 'updateProduct/<id>', methods=['POST'])
+def updateProduct(id):
+    record = json.loads(request.data)
+    try:
+        product_id = int(id)
+        global authToken
+        res = authentication(authToken)
+        if res == True:
+            orderId = models.execute_kw(login_data['db'], uid, login_data['dbpassword'], 'crm.lead', 'search', [
+                [['id', '=', product_id]]])
+            if not orderId:
+                return Response('Please Enter Correct Order Number!', status=400, mimetype='application/json')
+            data = models.execute_kw(login_data['db'], uid, login_data['dbpassword'], 'crm.lead', 'write', [[product_id],record])
+            if not data:
+                return Response('Please Enter Correct Order Number!', status=400, mimetype='application/json')
+            return Response('Record Update successfully!', status=201, mimetype='application/json')
+        else:
+            print("hello False")
+            return Response(res, status=400, mimetype='application/json')
+    except Exception as ex:
+        print('Sorry, something went wrong!')
+        return Response('Sorry, something went wrong!' + ' ' + str(ex), status=400, mimetype='application/json')
+
+
+
 if __name__ == '__main__':
     # app.run(debug=True)
     app.run(host="0.0.0.0", port="5000")
     # from waitress import serve
-    # serve(app,host='127.0.0.1',port=5000)
+    # serve(app,host='0.0.0.0',port=5000)
 
 
 

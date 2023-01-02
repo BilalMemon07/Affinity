@@ -44,7 +44,7 @@
 								<field name="invoice_attachment" widget="image" string="CNIC Front"/>
 							</group>
 							<group>
-								<field name="invoice_type" />
+								<field name="invoice_type" attrs="{'required':[('product_type','=', '3')]}" />
 								<field name="facility_request_date" />
 								<field name="instrument_due_date" />
 								<field name="description" />
