@@ -23,3 +23,25 @@ class Leads(models.Model):
     description = fields.Text(string="Description") #for (i)
     invoice_attachment = fields.Binary(string= "Upload Invoice") #for (i)
 
+    # related_stage_name = fields.Related('stage_id','name', type="char",string="stage")
+    related_stage_name = fields.Char(string='stage', related='stage_id.name')
+
+
+    # for Business Team 
+    bank_attachment = fields.Binary(string= "Bank Attactment")
+    trip_data = fields.Binary(string= "Trip Data")
+    ownership_doc = fields.Binary(string= "Truck Ownership")
+    # for Business Team & Risk & Compliance
+
+    kyc_check = fields.Boolean(string = 'Kyc check with NADRA')
+    bureau_check = fields.Boolean(string = 'Credit Bureau Check')
+    risk_score = fields.Float(string="Risk Score Calculation")
+    assign_limit = fields.Float(string="Assign Limit")
+
+    # for Business Team & Risk & Compliance & Management
+
+    priority = fields.Selection([('0', 'Normal'),('1', 'Good'),('2', 'Very Good'),('3', 'Excellent')], string="Priority", default='0')
+    Note = fields.Text(string="Appreciation",)
+
+
+

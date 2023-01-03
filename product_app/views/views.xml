@@ -6,17 +6,46 @@
 			<field name="model">crm.lead</field>
 			<field name="inherit_id" ref="crm.crm_lead_view_form" />
 			<field name="arch" type="xml">
-				<field name="partner_id" position="after">
-					<field name="product_type"/>
-				</field>
+				<xpath expr="/form/sheet/group" position="before">
+					<group>
+						<group>
+							<field name="related_stage_name"/>
+							<field name="product_type"/>
+						</group>
+					</group>
+				</xpath>
 				<xpath expr="/form/sheet/notebook" position="inside">
-					<page name="product_info" string="product Info">
+					<page name="docs" string="Documents">
+						<group>
+							<group>
+								<field name="bank_attachment" widget="image" string="Bank Attachment"/>
+								<field name="trip_data" widget="image" string="Trip Data Excel File"/>
+							</group>
+							<group>
+								<field name="ownership_doc" widget="image" string="Truck Owner Ship Doc"/>
+							</group>
+							<group attrs="{'invisible':[('related_stage_name','=', 'Business Team')]}">
+								<field name="kyc_check"/>
+								<field name="bureau_check"/>
+								<field name="risk_score"/>
+								<field name="assign_limit"/>
+							</group>
+							<group attrs="{'invisible':['|',('related_stage_name','=', 'Business Team'),('related_stage_name','=', 'Risk and Compliance')]}">
+								<field name="priority" widget="priority"/>
+								<field name="Note"/>
+							</group>
+						</group>
+						
+					</page>
+				</xpath>
+				<xpath expr="/form/sheet/notebook" position="inside">
+					<page name="product_info" string="Product Info">
 						<group attrs="{'invisible':[('product_type','!=', '1')]}">
 							<group>
 								<field name="limit_request" />
 								<field name="requested_amount"  />
 								<field name="instrument_number"  />
-								<field name="attachment" widget="image" string="CNIC Front"/>
+								<field name="attachment" widget="image" string="Attachment"/>
 							</group>
 							<group>
 								<field name="instrument_number" />
@@ -28,7 +57,7 @@
 							<group>
 								<field name="requested_amount"  />
 								<field name="instrument_number"  />
-								<field name="attachment" widget="image" string="CNIC Front"/>
+								<field name="attachment" widget="image" string="Attachment"/>
 							</group>
 							<group>
 								<field name="instrument_number" />
@@ -41,7 +70,7 @@
 								<field name="select_party"  />
 								<field name="invoice_amount"  />
 								<field name="tag_trip"  />
-								<field name="invoice_attachment" widget="image" string="CNIC Front"/>
+								<field name="invoice_attachment" widget="image" string="Upload Invoice"/>
 							</group>
 							<group>
 								<field name="invoice_type" attrs="{'required':[('product_type','=', '3')]}" />
