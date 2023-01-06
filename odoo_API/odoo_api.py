@@ -95,7 +95,10 @@ def createSaleOrder():
         global authToken
         res = authentication(authToken)
         if res == True:
-            
+            customer_search = models.execute_kw(login_data['db'], uid, login_data['dbpassword'], 'res.partner', 'search', [
+                [['mobile', '=', record['mobile']]]])
+            if customer_search:
+                return Response('User Already Exist, You Can not add This User 2nd Time', status=400, mimetype='application/json')
             id = models.execute_kw(login_data['db'], uid, login_data['dbpassword'], 'res.partner', 'create', [{
                 "customer_name":record['customer_name'],
                 "name":record['customer_name'],
@@ -191,11 +194,14 @@ def CreateCRM_product():
                     "instrument_due_date":record['instrument_due_date'],
                     "attachment" : record['attachment'],
                 }])
-                res_message ={
-                    "Message" : "Product Created Successfully",
-                    "id" : "Prodcut Created Id is" + " " + str(id)
+                res_message = {
+                    'Message' : 'Product Created Successfully',
+                    'id' : 'Prodcut Created Id is' + ' ' + str(id)
                 }
-                return Response(res_message, status=201, mimetype='application/json')
+                return Response(str({
+                    'Message' : 'Product Created Successfully',
+                    'id' : 'Prodcut Created Id is' + ' ' + str(id)
+                }), status=201, mimetype='application/json')
             elif product_type == "3":
                 id = models.execute_kw(login_data['db'], uid, login_data['dbpassword'], 'crm.lead', 'create', [{
                     "name":record['name'],
@@ -216,7 +222,7 @@ def CreateCRM_product():
                 }
                 return Response(res_message, status=201, mimetype='application/json')
             else:
-                return Response(res_message, status=404, mimetype='application/json')
+                return Response("This Product Is Not Exist", status=404, mimetype='application/json')
     
     except Exception as ex:
         print('Sorry, something went wrong!')
@@ -250,21 +256,27 @@ def updateProduct(id):
 def SearchCutomer():
     record = json.loads(request.data)
     try:
-        cusId = models.execute_kw(login_data['db'], uid, login_data['dbpassword'], 'res.partner', 'search', [
-                [["mobile",' =' ,record['mobile']]]])
-        if cusId:
-            res_message = {
-                "Message" : "Customer Is Already Exits",
-                "id" : "Customer Name is" + " " + str(res_message.name)
-            }
-            return Response(res_message, status=201, mimetype='application/json')
-        else:
+        product_id = int(id)
+        global authToken
+        res = authentication(authToken)
+        if res == True:
+            cusId = models.execute_kw(login_data['db'], uid, login_data['dbpassword'], 'res.partner', 'search', [
+                    [["mobile",' =' ,record['mobile']]]])
             if cusId:
+                res_message = {
+                    "Message" : "Customer Is Already Exits",
+                    "id" : "Customer Name is" + " " + str(res_message.name)
+                }
+                return Response(res_message, status=201, mimetype='application/json')
+            else:
                 res_message = {
                     "Message" : "Customer is Not Exits",
                     # "id" : "Customer Name is" + " " + str(res_message.name)
                 }
                 return Response(res_message, status=201, mimetype='application/json')
+        else:
+            print("hello False")
+            return Response(res, status=400, mimetype='application/json')
 
     except Exception as ex:
         print('Sorry, something went wrong!')

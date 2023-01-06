@@ -6,6 +6,8 @@ from odoo.exceptions import UserError
 class Leads(models.Model):
     _inherit = 'crm.lead'
 
+
+    state = fields.Selection([('pending', 'Pending'), ('approve', 'Approved'), ('reject', 'Reject')], string='Status', default='pending')
     product_type = fields.Selection([('1', 'Broker Lending'), ('2', 'Drive Throught Lending'),('3', 'Invoice Discounting')], string='Product Type', required=True) 
     limit_request = fields.Float(string= "limit Request") #for (b)
     requested_amount = fields.Float(string= "Requested Amount") #for (b/d)
@@ -44,4 +46,30 @@ class Leads(models.Model):
     Note = fields.Text(string="Appreciation",)
 
 
+    @api.model
+    def create(self,vals):
+        if vals.get('name', _('New')) == _('New'):
+            vals['state']='pending'
+        res = super(Leads,self).create(vals)
+        return res
 
+
+    def approve_action(self):
+        if self.stage_id.id == 1:
+            self['state'] = 'approve'
+            self['stage_id'] = 2
+            self['state'] ='pending'
+        if self.stage_id.id == 2:
+            self['state'] = 'approve'
+            self['stage_id'] = 3
+            self['state'] ='pending'
+        if self.stage_id.id == 3:
+            self['state'] = 'approve'
+            # self['stage_id'] = 2
+            self['state'] ='pending'
+        
+        # raise UserError("Helllo")
+
+    def reject_action(self):
+        self['state']='reject'
+        # raise UserError("Helllo")

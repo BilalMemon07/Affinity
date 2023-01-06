@@ -6,6 +6,15 @@
 			<field name="model">crm.lead</field>
 			<field name="inherit_id" ref="crm.crm_lead_view_form" />
 			<field name="arch" type="xml">
+				<xpath expr="/form/header" position="before">
+					<header>	
+						<field name="state" widget="statusbar" statusbar_visible="approve,reject,pending"/>
+					</header>
+				</xpath>
+				<xpath expr="/form/header[1]" position="inside">
+					<button name="approve_action" states="pending,reject" string="Approve" type="object"/>						
+					<button name="reject_action" states="pending,approve" string="Reject" type="object"/>						
+				</xpath>
 				<xpath expr="/form/sheet/group" position="before">
 					<group>
 						<group>
