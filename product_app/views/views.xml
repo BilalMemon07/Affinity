@@ -23,6 +23,9 @@
 						</group>
 					</group>
 				</xpath>
+				<field name="tag_ids" position="after">
+					<field name="rejection_note"/>
+				</field>
 				<xpath expr="/form/sheet/notebook" position="inside">
 					<page name="docs" string="Documents">
 						<group>
@@ -45,6 +48,19 @@
 							</group>
 						</group>
 						
+					</page>
+				</xpath>
+				<!-- For Risk and compliance Tab -->
+				<xpath expr="/form/sheet/notebook" position="inside" >
+					<page name="risk_tab" string="Risk and Compliance"  attrs="{'invisible':[('related_stage_name','=', 'Business Team')]}">
+						<group>
+							<group>
+								<field name="kyc_check"/>
+								<field name="bureau_check"/>
+								<field name="risk_score"/>
+								<field name="assign_limit"/>
+							</group>
+						</group>
 					</page>
 				</xpath>
 				<xpath expr="/form/sheet/notebook" position="inside">
@@ -92,5 +108,29 @@
 				</xpath>
 			</field>
 		</record>
+		<record id="view_crm_kanban_form_inherit" model="ir.ui.view">
+			<field name="name">view_crm_product_form_inherit</field>
+			<field name="model">crm.lead</field>
+			<field name="inherit_id" ref="crm.quick_create_opportunity_form" />
+			<field name="arch" type="xml">
+				<field name="partner_id" position="before">
+					<field name="product_type"/>
+				</field>
+			</field>
+		</record>
+
+		<record id="view_crm_kanban_lead_inherit" model="ir.ui.view">
+			<field name="name">view_crm_product_lead_inherit</field>
+			<field name="model">crm.lead</field>
+			<field name="inherit_id" ref="crm.crm_case_kanban_view_leads" />
+			<field name="arch" type="xml">
+				<xpath expr="/kanban/templates/t/div/div[3]/div[4]" position="after">
+					<div>
+                        <field name="product_type"/>
+                    </div>
+				</xpath>
+			</field>
+		</record>
 	</data>
 </odoo>
+

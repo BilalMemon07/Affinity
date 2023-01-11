@@ -44,6 +44,7 @@ class Leads(models.Model):
 
     priority = fields.Selection([('0', 'Normal'),('1', 'Good'),('2', 'Very Good'),('3', 'Excellent')], string="Priority", default='0')
     Note = fields.Text(string="Appreciation",)
+    rejection_note = fields.Text(string="Rejection Note")
 
 
     @api.model
@@ -59,11 +60,11 @@ class Leads(models.Model):
             self['state'] = 'approve'
             self['stage_id'] = 2
             self['state'] ='pending'
-        if self.stage_id.id == 2:
+        elif self.stage_id.id == 2:
             self['state'] = 'approve'
             self['stage_id'] = 3
             self['state'] ='pending'
-        if self.stage_id.id == 3:
+        elif self.stage_id.id == 3:
             self['state'] = 'approve'
             # self['stage_id'] = 2
             self['state'] ='pending'
@@ -71,5 +72,35 @@ class Leads(models.Model):
         # raise UserError("Helllo")
 
     def reject_action(self):
-        self['state']='reject'
+        if self.stage_id.id == 1:
+            if self.rejection_note:
+                self['state']='reject'
+                self['description'] = str(self.description) + " " + str(self.rejection_note) + ' ' +'('+ str(self.related_stage_name) + ')'
+                self['rejection_note'] = False
+            else:
+                raise UserError('Please Enter The Rejection Note')
+        elif self.stage_id.id == 2:
+            if self.rejection_note:
+                self['state']='reject'
+                self['description'] = str(self.description) + " " + str(self.rejection_note) + ' ' +'('+ str(self.related_stage_name) + ')'
+                self['rejection_note'] = False
+                self['stage_id'] = 1
+                self['state'] ='pending'
+            else:
+                raise UserError('Please Enter The Rejection Note')
+        elif self.stage_id.id == 3:
+            if self.rejection_note:
+                self['state']='reject'
+                self['description'] = str(self.description) + " " + str(self.rejection_note) + ' ' + '('+ str(self.related_stage_name) + ')'
+                self['rejection_note'] = False
+                self['stage_id'] = 2
+                self['state'] ='pending'
+            else:
+                raise UserError('Please Enter The Rejection Note')
+        
         # raise UserError("Helllo")
+    @api.onchange('product_type','partner_id')
+    def partner_id_domain_pur(self):
+        if self.product_type == '1': 
+            return {"domain": {'partner_id': [('state', '=', 'approve')]}}
+        return {"domain": {'partner_id': []}}
