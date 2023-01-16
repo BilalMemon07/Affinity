@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_scheme_app_tree" model="ir.ui.view">
+        <field name="name">scheme_app.tree</field>
+        <field name="model">scheme</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" string="Name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_scheme_module_form" model="ir.ui.view">
+        <field name="name">scheme_module.form</field>
+        <field name="model">scheme</field>
+        <field name="arch" type="xml">
+            <form>
+                <!-- <header>
+                    <button name="server_post_expense_action" states="draft" string="Post Expense" type="object"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,posted"/>
+                </header> -->
+                <sheet>
+                    <!-- <div class="oe_button_box" name="button_box">
+                        <button name="open_patient_appointment" type="object" class="oe_stat_button" icon="fa-book">
+                            <field name="expense_count" string="Journal Entry" widget="statinfo"/>
+                        </button>
+                    </div> -->
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="currency_id"/>
+                            <field name="value"/>
+                        </group>
+                    </group>
+
+                    <field name="line_id">
+                        <tree editable="bottom">
+                            <field name="product_id"/>
+                            <field name="start_date"/>
+                            <field name="end_date"/>
+                            <field name="market_commission"/>
+                            <field name="disc"/>
+                            <field name="ditributor_commission"/>
+                            <field name="extra_disc"/>
+                        </tree>
+                        <form>
+                            <group>
+                                <group>
+                                    <field name="product_id"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                    <field name="market_commission"/>
+                                    <field name="disc"/>
+                                    <field name="ditributor_commission"/>
+                                    <field name="extra_disc"/>
+                                </group>
+                            </group>
+                        </form>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+
+    <record id="view_partner_scheme_form_inherit" model="ir.ui.view">
+        <field name="name">res.partner.scheme.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <field name="vat" position="before">
+                <field name="scheme_id"/>
+            </field>
+        </field>
+    </record>
+    <record id="view_sale_order_form_inherit" model="ir.ui.view">
+        <field name="name">res.sale_order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="before">
+                <field name="scheme_id"/>
+            </field>
+            <xpath expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='price_unit']" position="after">
+                <field name="disc_1"/>
+                <field name="disc_2"/>
+                <field name="disc_3"/>
+                <field name="disc_4"/>
+                <field name="total_discount"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="scheme_module_action" model="ir.actions.act_window">
+        <field name="name">Scheme</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">scheme</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                 Create Your First Record
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="scheme_module_root" name="Scheme" parent="" sequence="10"/>
+    <menuitem id="scheme_module" name="Scheme" parent="scheme_module_root" action="scheme_module_action" sequence="10"/>
+</odoo>
