@@ -33,7 +33,9 @@
                     <group>
                         <group>
                             <field name="currency_id"/>
-                            <field name="value"/>
+                                <field name="brand_ids" widget="many2many_tags"/>
+                                <button name='onclick_all_brand_line' type='object' string="Fetch Products" />
+                            <!-- <field name="value"/> -->
                         </group>
                     </group>
 

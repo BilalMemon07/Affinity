@@ -8,7 +8,7 @@
     'summary': '',
     'description': """""",
     'sequence': '-100',
-    'depends': ['product','base','sale'],
+    'depends': ['product','base','sale','stock'],
     'data': [
         'views/scheme_view.xml',
         'security/ir.model.access.csv',
