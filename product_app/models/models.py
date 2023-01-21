@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
-
+from datetime import datetime
     
+class AccountMove(models.Model):
+    _inherit = 'account.move'
+
+    crm_id = fields.Many2one('crm.lead' , string="CRM")
+
 class Leads(models.Model):
     _inherit = 'crm.lead'
 
@@ -16,6 +21,8 @@ class Leads(models.Model):
     facility_request_date = fields.Date(string= "Facility Request date") #for (b/d/i)
     instrument_due_date = fields.Date(string= "Instrument due date") #for (b/d/i)
     attachment = fields.Binary(string= "Attachment") #for (b/d)
+
+    interest_rate = fields.Float(string= "Interest Rate") 
 
     # for invoice
     select_party = fields.Char(string="Select Party (coporate)") #for (i)
@@ -45,7 +52,22 @@ class Leads(models.Model):
     priority = fields.Selection([('0', 'Normal'),('1', 'Good'),('2', 'Very Good'),('3', 'Excellent')], string="Priority", default='0')
     Note = fields.Text(string="Appreciation",)
     rejection_note = fields.Text(string="Rejection Note")
+    crm_count = fields.Integer(string='Invoice', compute='get_crm_count')
+    
+    def get_crm_count(self):
+        count = self.env['account.move'].search_count([('crm_id', '=', self.id)])
+        self.crm_count = count  
 
+    def open_patient_appointment(self):
+        return {
+            'name': 'Invoice',
+            'domain': [('crm_id', '=', self.id)],
+            'view_type': 'form',
+            'res_model': 'account.move',
+            'view_id': False,
+            'view_mode': 'tree,form',
+            'type': 'ir.actions.act_window'
+        }
 
     @api.model
     def create(self,vals):
@@ -56,18 +78,23 @@ class Leads(models.Model):
 
 
     def approve_action(self):
-        if self.stage_id.id == 1:
+        if self.product_type == '1' or self.product_type == '3':
+            if self.stage_id.id == 1: 
+                self['state'] = 'approve'
+                self['stage_id'] = 2
+                self['state'] ='pending'
+            elif self.stage_id.id == 2:
+                self['state'] = 'approve'
+                self['stage_id'] = 3
+                self['state'] ='pending'
+            elif self.stage_id.id == 3:
+                self['state'] = 'approve'
+                self['stage_id'] = 7
+                # self['state'] ='pending'
+        else:
             self['state'] = 'approve'
-            self['stage_id'] = 2
-            self['state'] ='pending'
-        elif self.stage_id.id == 2:
-            self['state'] = 'approve'
-            self['stage_id'] = 3
-            self['state'] ='pending'
-        elif self.stage_id.id == 3:
-            self['state'] = 'approve'
-            # self['stage_id'] = 2
-            self['state'] ='pending'
+            self['stage_id'] = 8
+        
         
         # raise UserError("Helllo")
 
@@ -104,3 +131,44 @@ class Leads(models.Model):
         if self.product_type == '1': 
             return {"domain": {'partner_id': [('state', '=', 'approve')]}}
         return {"domain": {'partner_id': []}}
+
+    def action_create_invoice(self):
+        lines = []
+        commisiionlines = []
+        for rec in self:
+            commission_value = 20000
+            income_account = self.env['account.account'].search([('code', '=', "3111001")])
+            # receivable_account = self.env['account.account'].search([('code', '=', "1121001")])
+            commission_account = self.env['account.account'].search([('code', '=', "4311002")])
+            # raise UserError(str(income_account.name) + ', ' + str(receivable_account.name) + ', ' + str(commission_account.name))
+            lines.append((0,0,{
+                'product_id': 1,
+                'account_id' : income_account.id,
+                'quantity':1,
+                'price_unit' : 120000
+            }))
+            commisiionlines.append((0, 0,
+                {
+                'account_id': commission_account.id,
+                'credit': commission_value,
+                'exclude_from_invoice_tab': True
+                }
+            ))
+            move = self.env['account.move'].create({
+            'journal_id': 1,
+            'invoice_date': datetime.now(),
+            'invoice_date_due': datetime.now(),
+            'invoice_line_ids':lines,
+            'move_type':'out_invoice',
+            'partner_id' : rec.partner_id.id,
+            'crm_id': rec.id,
+            })
+            move.with_context(check_move_validity=False).write({
+                'line_ids' : commisiionlines
+            })
+            for line in move.line_ids:
+                if line.account_id == income_account:
+                    line['credit'] = line.credit-commission_value
+                    break
+ 
+        # move.action_post()        

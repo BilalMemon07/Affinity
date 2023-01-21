@@ -11,9 +11,23 @@
 						<field name="state" widget="statusbar" statusbar_visible="approve,reject,pending"/>
 					</header>
 				</xpath>
+				<xpath expr="/form/sheet/div/button[1]" position="before">
+					<!-- <div class="o_stat_info" name="button_box">
+                    	<button name="open_patient_appointment" type="object" class="oe_stat_button" icon="fa-book">
+                            <field name="crm_count" string="Invoice" widget="statinfo"/>
+                    	</button>
+                    </div> -->
+					<button name="open_patient_appointment" type="object" class="oe_stat_button" icon="fa-book" attrs="{'invisible': [('type', '=', 'lead')]}">
+						<div class="o_stat_info">
+							<field name="crm_count" class="o_stat_value" string="Invoice"/>
+							<span class="o_stat_text">Invoice</span>
+						</div>
+                    </button>
+				</xpath>
 				<xpath expr="/form/header[1]" position="inside">
 					<button name="approve_action" states="pending,reject" string="Approve" type="object"/>						
 					<button name="reject_action" states="pending,approve" string="Reject" type="object"/>						
+					<button name="action_create_invoice" states="approve" string="Create Invoice" type="object"/>						
 				</xpath>
 				<xpath expr="/form/sheet/group" position="before">
 					<group>
