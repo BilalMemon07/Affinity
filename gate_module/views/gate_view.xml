@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+
+    <record id="view_gate_module_tree" model="ir.ui.view">
+        <field name="name">gate_module.tree</field>
+        <field name="model">gate.in</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" string="Name" />
+            </tree>
+        </field>
+    </record>
+    <record id="view_gate_out_module_tree" model="ir.ui.view">
+        <field name="name">gate_out_module.tree</field>
+        <field name="model">gate.out</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" string="Name" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_gate_module_form" model="ir.ui.view">
+        <field name="name">gate_module.form</field>
+        <field name="model">gate.in</field>
+        <field name="arch" type="xml">
+            <form>
+                
+                <header>
+                    <button name="post_action" states="draft" string="Confirm" type="object"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                </header>
+                <sheet>                   
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="vendor_type"  attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="gate_type"  attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="partner_id"
+                                attrs="{'invisible':['|',('vendor_type','!=','vendor'),('vendor_type','=',False)],'readonly':[('state','=','done')]}" />
+                            <field name="vendor_name"
+                                attrs="{'invisible':['|',('vendor_type','=','vendor'),('vendor_type','=',False)],'readonly':[('state','=','done')]}" />
+                            <field name="location_name"  attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="receiver_name"  attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="department_id"  attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="attention_to"  attrs="{'readonly':[('state','=','done')]}"/>
+                        </group>
+                        <group>
+                            <field name="purchase_id"
+                                attrs="{'invisible':['|',('vendor_type','!=','vendor'),('vendor_type','=',False)],'readonly':[('state','=','done')]}" />
+                            <field name="return_date"
+                                attrs="{'invisible':['|',('gate_type','=','nonreturnable'),('vendor_type','=',False)],'readonly':[('state','=','done')]}" />
+                            <field name="date_time"  attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="saneder_name"  attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="saneder_number"  attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="vehicle_number"  attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="phone"  attrs="{'readonly':[('state','=','done')]}"/>
+                        </group>
+                    </group>
+
+                    <field name="line_id"
+                        attrs="{'invisible':['|',('vendor_type','!=','vendor'),('vendor_type','=',False),]}">
+                        <tree editable="bottom" create="0">
+                            <field name="product_id" />
+                            <field name="product_uom_id" />
+                            <field name="qty" />
+                        </tree>
+                        <form>
+                            <group>
+                                <group>
+                                    <field name="product_id" />
+                                    <field name="product_uom_id" />
+                                    <field name="qty" />
+                                </group>
+                            </group>
+                        </form>
+                    </field>
+
+                    <field name="line_ids"
+                        attrs="{'invisible':['|',('vendor_type','=','vendor'),('vendor_type','=',False),]}">
+                        <tree editable="bottom">
+                            <field name="product" />
+                            <field name="product_uom" />
+                            <field name="qty" />
+                        </tree>
+                        <form>
+                            <group>
+                                <group>
+                                    <field name="product" />
+                                    <field name="product_uom" />
+                                    <field name="qty" />
+                                </group>
+                            </group>
+                        </form>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="view_gate_out_module_form" model="ir.ui.view">
+        <field name="name">gate_out_module.form</field>
+        <field name="model">gate.out</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="post_action" states="draft" string="Confirm" type="object"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="customer_type" attrs="{'readonly':[('state','=','done')]}" />
+                            <field name="gate_type" attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="partner_id"
+                                attrs="{'invisible':['|',('customer_type','!=','customer'),('customer_type','=',False)],'readonly':[('state','=','done')]}" />
+                            <field name="customer_name"
+                                attrs="{'invisible':['|',('customer_type','=','customer'),('customer_type','=',False)],'readonly':[('state','=','done')]}" />
+                            <field name="location_name" attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="sender_name" attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="department_id" attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="attention_to" attrs="{'readonly':[('state','=','done')]}"/>
+                        </group>
+                        <group>
+                            <field name="sale_id"
+                                attrs="{'invisible':['|',('customer_type','!=','customer'),('customer_type','=',False)],'readonly':[('state','=','done')]}" />
+                            <field name="return_date"
+                                attrs="{'invisible':['|',('gate_type','=','nonreturnable'),('customer_type','=',False)],'readonly':[('state','=','done')]}" />
+                            <field name="date_time" attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="receiver_name" attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="receiver_number" attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="vehicle_number" attrs="{'readonly':[('state','=','done')]}"/>
+                            <field name="phone" attrs="{'readonly':[('state','=','done')]}"/>
+                        </group>
+                    </group>
+
+                    <field name="line_id"
+                    attrs="{'invisible':['|',('customer_type','!=','customer'),('customer_type','=',False)],'readonly':[('state','=','done')]}">
+                        <tree editable="bottom" create="0">
+                            <field name="product_id" />
+                            <field name="product_uom_id" />
+                            <field name="qty" />
+                        </tree>
+                        <form>
+                            <group>
+                                <group>
+                                    <field name="product_id" />
+                                    <field name="product_uom_id" />
+                                    <field name="qty" />
+                                </group>
+                            </group>
+                        </form>
+                    </field>
+
+                    <field name="line_ids"
+                    attrs="{'invisible':['|',('customer_type','=','customer'),('customer_type','=',False)]}">
+                        <tree editable="bottom">
+                            <field name="product" />
+                            <field name="product_uom" />
+                            <field name="qty" />
+                        </tree>
+                        <form>
+                            <group>
+                                <group>
+                                    <field name="product" />
+                                    <field name="product_uom" />
+                                    <field name="qty" />
+                                </group>
+                            </group>
+                        </form>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="gate_module_action" model="ir.actions.act_window">
+        <field name="name">Gate In</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">gate.in</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Your First Record
+            </p>
+        </field>
+    </record>
+    <record id="gate_out_module_action" model="ir.actions.act_window">
+        <field name="name">Gate Out</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">gate.out</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Your First Record
+            </p>
+        </field>
+    </record>
+
+
+    <menuitem id="gate_module_root" name="Gate Module" parent="" sequence="10" />
+    <menuitem id="gate_in_module" name="Gate In" parent="gate_module_root"
+        action="gate_module_action" sequence="10" />
+    <menuitem id="gate_out_module" name="Gate Out" parent="gate_module_root"
+        action="gate_out_module_action" sequence="11" />
+</odoo>

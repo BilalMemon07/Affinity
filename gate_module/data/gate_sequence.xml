@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="seq_expense" model="ir.sequence">
+        <field name="name">Gate In Seq</field>
+        <field name="code">Gate_IN</field>
+        <field name="prefix">G-IN/%(y)s/%(month)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+        </record>
+    </data>
+    <data>
+        <record id="seq_expenses" model="ir.sequence">
+        <field name="name">Gate out Seq</field>
+        <field name="code">Gate_OUT</field>
+        <field name="prefix">G-OUT/%(y)s/%(month)s/</field>
+        <field name="padding">5</field>
+        <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

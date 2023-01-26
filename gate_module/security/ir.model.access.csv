@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_gate_in,access.gate.in,model_gate_in,,1,1,1,1
+access_gate_out,access.gate.out,model_gate_out,,1,1,1,1
+access_gate_vendor_line,access.gate.vendor.line,model_gate_vendor_line,,1,1,1,1
+access_gate_customer_line,access.gate.customer.line,model_gate_customer_line,,1,1,1,1
+access_gate_other_line,access.gate.other.line,model_gate_other_line,,1,1,1,1
+access_gate_other_lines,access.gate.other.lines,model_gate_other_lines,,1,1,1,1
