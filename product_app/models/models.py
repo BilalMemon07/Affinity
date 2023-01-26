@@ -3,10 +3,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from datetime import datetime
     
-class AccountMove(models.Model):
-    _inherit = 'account.move'
 
-    crm_id = fields.Many2one('crm.lead' , string="CRM")
 
 class Leads(models.Model):
     _inherit = 'crm.lead'
@@ -171,4 +168,36 @@ class Leads(models.Model):
                     line['credit'] = line.credit-commission_value
                     break
  
-        # move.action_post()        
+    
+    
+      # move.action_post()       
+
+
+class AccountMove(models.Model):
+    _inherit = 'account.move'
+
+    crm_id = fields.Many2one('crm.lead' , string="CRM")
+
+    def disbursement_payment(self):
+        for rec in self:
+            if rec.state == 'posted':
+                payment_obj = rec.env['account.payment']
+                # sale_order = rec.env['sale.order'].search([('name','=',rec.invoice_origin)])
+                # delivery_order = rec.env['stock.picking'].search([('origin','=',sale_order.name)])
+                # for dev_line in delivery_order:
+                # if sale_order:
+                    # if dev_line['x_studio_courier'] == "Courier":
+                        # if dev_line['x_studio_payment_type'] == "Cash" or dev_line['x_studio_payment_type'] == False:
+                journal = self.env['account.journal'].search([('id', '=', 7)])
+                payment_obj.create({
+                    'partner_id': rec.partner_id.id,
+                    'payment_type' : 'outbound',
+                    'partner_type' : 'customer',
+                    'destination_account_id' : 32,
+                    # 'journal_id' : rec.journal_id.id,
+                    # 'payment_method_id':4,
+                    'date':datetime.now() ,
+                    # 'payment_method_line_id': 2,#journal.outbound_payment_method_line_ids[0].id,
+                    'amount': rec.amount_total,
+                    })
+
