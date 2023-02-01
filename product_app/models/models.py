@@ -142,7 +142,7 @@ class Leads(models.Model):
                 'product_id': 1,
                 'account_id' : income_account.id,
                 'quantity':1,
-                'price_unit' : 120000
+                'price_unit' : 100000
             }))
             commisiionlines.append((0, 0,
                 {
@@ -177,11 +177,18 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     crm_id = fields.Many2one('crm.lead' , string="CRM")
+    disbursement_id = fields.Many2one('account.disbursement' , string="Disbursement")
 
     def disbursement_payment(self):
         for rec in self:
             if rec.state == 'posted':
-                payment_obj = rec.env['account.payment']
+                payment_obj = rec.env['account.disbursement']
+                amount = 0
+                account_id = False
+                for line in self.invoice_line_ids:
+                    if line.name == "DTL":
+                        account_id = line.account_id
+                        amount =line.price_subtotal
                 # sale_order = rec.env['sale.order'].search([('name','=',rec.invoice_origin)])
                 # delivery_order = rec.env['stock.picking'].search([('origin','=',sale_order.name)])
                 # for dev_line in delivery_order:
@@ -190,14 +197,106 @@ class AccountMove(models.Model):
                         # if dev_line['x_studio_payment_type'] == "Cash" or dev_line['x_studio_payment_type'] == False:
                 journal = self.env['account.journal'].search([('id', '=', 7)])
                 payment_obj.create({
-                    'partner_id': rec.partner_id.id,
-                    'payment_type' : 'outbound',
-                    'partner_type' : 'customer',
-                    'destination_account_id' : 32,
-                    # 'journal_id' : rec.journal_id.id,
-                    # 'payment_method_id':4,
+                    'vendor_id': rec.partner_id.id,
+                    # 'payment_type' : 'outbound',
+                    # 'partner_type' : 'customer',
+                    # 'destination_account_id' : 32,
+                    'memo':rec.name,
+                    'journal_id' : rec.journal_id.id,
+                    'payment_method':"Manual",
                     'date':datetime.now() ,
                     # 'payment_method_line_id': 2,#journal.outbound_payment_method_line_ids[0].id,
-                    'amount': rec.amount_total,
+                    'amount': amount,
                     })
+                # if payment_obj:
+                #     for line in payment_obj.move_id.line_ids:
+                #         if line.account_id.id == 32:
+                #             raise UserError(line.account_id.name)
+                #             line['account_id'] = account_id 
 
+
+class Disbursementmodels(models.Model):
+    _name='account.disbursement'
+    _description='Disbursement'
+    # fields used in payment forms
+    document_name=fields.Char(string="Number")
+    internal_transfer=fields.Boolean(string='Internal Transfer')
+    payment_type=fields.Selection([('Send', 'Send'), ('Receive', 'Receive')],string='Payment Type',required=True,default='Receive')
+    vendor_id=fields.Many2one('res.partner',string='Vendor')
+
+    amount=fields.Float(string='Amount')
+    date=fields.Datetime(string='Date')
+    memo=fields.Char(string='Memo')
+    journal_id=fields.Many2one('account.journal',string='Journal')
+    bank_vendor_id=fields.Many2one('res.partner.bank',string="Vendor Bank Account")
+    payment_method=fields.Selection([('Manual','Manual'),('Checks','Checks')],string="Payment Method",required=True)
+
+    state=fields.Selection([('draft','Draft'),('post','Posted'),('cancel','cancelled')],string="Status")
+
+    journal_count = fields.Integer(string='Entries', compute='get_crm_count')
+    
+    def get_crm_count(self):
+        count = self.env['account.move'].search_count([('disbursement_id', '=', self.id)])
+        self.journal_count = count
+
+    def open_journal_entries(self):
+        return {
+            'name': 'Entries',
+            'domain': [('disbursement_id', '=', self.id)],
+            'view_type': 'form',
+            'res_model': 'account.move',
+            'view_id': False,
+            'view_mode': 'tree,form',
+            'type': 'ir.actions.act_window'
+        }
+    #configures record directory and sets it in name form
+    def name_get(self):
+        result = []
+        for record in self:
+            result.append((record.id,record.document_name))
+        return result
+
+    @api.model
+    def create(self, values):
+        values['state'] = 'draft'
+        return super(Disbursementmodels, self).create(values)
+
+    def button_in_progress(self):
+        # self.write({'state': "post"})
+        for rec1 in self:  
+            lines = []
+            credit = 0
+            invoice = self.env['account.move'].search([('name', '=', self.memo)])
+            if invoice:
+                for inv in invoice:
+                    for invline in inv.invoice_line_ids:
+                        if invline.name == "DTL":
+                            
+                            line = (0, 0, {
+                                'account_id': 87,
+                                'debit':invline.price_subtotal ,
+                                'partner_id': rec1.vendor_id.id,
+                            })
+                            lines.append(line)
+                            line = (0, 0, {
+                                'account_id': invline.account_id.id,
+                                'credit': invline.price_subtotal,
+                                })
+                            lines.append(line)
+                        
+                            self.env['account.move'].create({
+                            'journal_id': rec1.journal_id.id,
+                            'date': rec1.date,
+                            'line_ids': lines,
+                            'ref': rec1.document_name,
+                            'disbursement_id': rec1.id,
+                            })
+                            rec1.write({
+                            'state': 'post',
+                            })
+
+    def button_cancel(self):
+        self.write({'state':'cancel'})
+    
+    def button_draft(self):
+        self.write({'state' : 'draft'})

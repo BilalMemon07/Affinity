@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+        <record id="view_disbursement_tree" model="ir.ui.view">
+            <field name="name">account.disbursement.tree</field>
+            <field name="model">account.disbursement</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="document_name" />
+                    <field name="journal_id" />
+                    <field name="payment_method" />
+                    <field name="vendor_id" />
+                    <field name='amount' />
+                    <field name='state' />
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_disbursement_form" model="ir.ui.view">
+            <field name="name">account.disbursement.form</field>
+            <field name="model">account.disbursement</field>
+            <field name="arch" type="xml">
+
+                <!-- Entire Document -->
+                <form>
+                    <!-- Statusbar -->
+                    <header>
+                        <button name="button_in_progress" class="oe_highlight" states="draft"
+                            string="Post" type="object" help="Post Document" />
+                        <button name="button_cancel" class="oe_highlight" states="draft" string="Cancel"
+                            type="object" help="Cancel Document" />
+                        <button name="button_draft" class="oe_highlight" states="post,cancel"
+                            string="Reset To Draft" type="object" help="Draft Document" />
+                        <field name="state" widget="statusbar" nolabel="1" options="{'clickable':'1'}"
+                            
+                            statusbar_visible="draft,post" />
+                    </header>
+                    <!-- Actual Form are below -->
+                    <sheet>
+                       
+                        <div class="oe_button_box" name="button_box">
+                            <button name="open_journal_entries" type="object" class="oe_stat_button" icon="fa-book">
+                                <field name="journal_count" string="Journal Entry" widget="statinfo"/>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="document_name" />
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name='internal_transfer' />
+                                <field name='payment_type' />
+                                <field name="vendor_id" />
+                                <field name="amount" />
+                                <field name="date" />
+                                <field name="memo" />
+                            </group>
+                            <group>
+                                <field name="journal_id" />
+                                <field name="payment_method" />
+                                <field name="bank_vendor_id" />
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="account_disbursement_action_form" model="ir.actions.act_window">
+            <field name="name">Disbursement Payment</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.disbursement</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create Your First Record
+                </p>
+            </field>
+        </record>
+	    
+        
+        
+        <menuitem action="account_disbursement_action_form" id="menu_id_disbursement_payment" parent="account.menu_finance_receivables" sequence="5"/>
+
+		
+	</data>
+</odoo>
