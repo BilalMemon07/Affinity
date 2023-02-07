@@ -10,9 +10,10 @@ class Scheme(models.Model):
     name = fields.Char(string='Scheme Name')
     currency_id = fields.Many2one('res.currency',string='Currency')
     value = fields.Monetary(string='Value',)
-    brand_ids = fields.Many2many('x_brand', store=True, string='Brand Name',  readonly=False)
-    line_id = fields.One2many('scheme.line', 'scheme_id', string="Expense Line")
-
+    brand_ids = fields.Many2many('x_product_brand', store=True, string='Brand Name',  readonly=False)
+    line_id = fields.One2many('scheme.line', 'scheme_id', string="Scheme Line")
+    start_date = fields.Datetime(string='Start Date')
+    end_date = fields.Datetime(string='End Date')
 
     # @api.onchange('brand_ids')
     def onclick_all_brand_line(self):
@@ -25,7 +26,7 @@ class Scheme(models.Model):
             # raise UserError(id)
             ids.append(brand.id)
         
-        other_model_record = self.env['product.product'].search([('x_studio_many2one_brand','in', ids)])
+        other_model_record = self.env['product.product'].search([('x_studio_product_brand','in', ids)])
         # raise UserError(other_model_record)
         # raise UserError(other_model_record)
         if other_model_record:
@@ -40,9 +41,12 @@ class SchemeLine(models.Model):
     _description = "Scheme Line"
 
     scheme_id = fields.Many2one('scheme')
+    type=fields.Selection([('Brand','Brand'),('Product','Product'),('Supplier','Supplier')],string="Type")
+    supplier_id=fields.Many2one('res.partner',string="Supplier")
+    brand_id=fields.Many2one('x_product_brand',string="Brand")
     product_id = fields.Many2one('product.product',string='Product')
-    start_date = fields.Datetime(string='Start Date')
-    end_date = fields.Datetime(string='End Date')
+    pcs = fields.Many2one('uom.uom',string='Pcs')
+    grams = fields.Char(string='Grams')
     market_commission = fields.Float(string='Market Commission')
     disc = fields.Float(string='Disc %')
     ditributor_commission = fields.Float(string='Ditributor Commission')
@@ -58,6 +62,7 @@ class SaleOrder(models.Model):
 
     @api.onchange('order_line')
     def apply_scheme(self):
+        total_discount_mas = 0
         sub_value_1 = 0
         sub_value_2 = 0
         sub_value_3 = 0
@@ -67,59 +72,58 @@ class SaleOrder(models.Model):
         discounted_value_3 = 0
         discounted_value_4 = 0
         scheme_line = self.partner_id.scheme_id.line_id
+        scheme_main = self.partner_id.scheme_id
+        # ('Brand','Brand'),('Product','Product'),('Supplier','Supplier')
         for line in self.order_line:
             for scheme in scheme_line:
-                date_strt, date_end =  scheme.start_date, scheme.end_date
-                if self.date_order >= date_strt and self.date_order <= date_end:
-                    if line.product_id == scheme.product_id:
-                        line['disc_1'] = scheme['market_commission'] 
-                        line['disc_2'] = scheme['disc'] 
-                        line['disc_3'] = scheme['ditributor_commission'] 
-                        line['disc_4'] = scheme['extra_disc']
-            if line['disc_1'] >= 0:
+                date_strt, date_end =  scheme_main.start_date, scheme_main.end_date
+                if date_strt and date_end:
+                    if self.date_order >= date_strt and self.date_order <= date_end:
+                        if scheme.type == "Product":
+                            if line.product_id == scheme.product_id:
+                                line['disc_1'] = scheme['market_commission'] 
+                                line['disc_2'] = scheme['disc'] 
+                                line['disc_3'] = scheme['ditributor_commission'] 
+                                line['disc_4'] = scheme['extra_disc']
+                        elif scheme.type == "Brand":
+                            if line.product_id.x_studio_product_brand == scheme.product_id:
+                                line['disc_1'] = scheme['market_commission'] 
+                                line['disc_2'] = scheme['disc'] 
+                                line['disc_3'] = scheme['ditributor_commission'] 
+                                line['disc_4'] = scheme['extra_disc']
+                        # elif scheme.type == "Supplier":
+                        #     if line.product_id.x_studio_product_brand == scheme.product_id:
+                        #         line['disc_1'] = scheme['market_commission'] 
+                        #         line['disc_2'] = scheme['disc'] 
+                        #         line['disc_3'] = scheme['ditributor_commission'] 
+                        #         line['disc_4'] = scheme['extra_disc']
+
+            # if line['disc_1'] >= 0:
                 if line['disc_1'] > 0:
                     discounted_value_1 = (line.price_unit * line['disc_1']) / 100
                 sub_value_1 = line.price_unit - discounted_value_1
-            if line['disc_2'] >= 0:
+                # raise UserError(sub_value_1)
+            # if line['disc_2'] >= 0:
                 if line['disc_2'] > 0:
                     discounted_value_2 = (sub_value_1 * line['disc_2']) / 100
                 sub_value_2 = sub_value_1 - discounted_value_2
-            if line['disc_3'] >= 0:
+                # raise UserError(sub_value_2)
+            # if line['disc_3'] >= 0:
                 if line['disc_3'] > 0:
                     discounted_value_3 = (sub_value_2 * line['disc_3']) / 100
                 sub_value_3 = sub_value_2 - discounted_value_3
-            if line['disc_4'] >= 0:
-                if line['disc_1'] > 0:
+            # if line['disc_4'] >= 0:
+                if line['disc_4'] > 0:
                     discounted_value_4 = (sub_value_3 * line['disc_4']) / 100
                 sub_value_4 = sub_value_3 - discounted_value_4
                 # raise UserError(sub_value_4)
-            if discounted_value_4 >= 0:
-                line['total_discount'] = line['price_subtotal']-sub_value_4
-                line['price_subtotal'] = sub_value_4
+            # line['total_discount'] =  discounted_value_1 + discounted_value_2 + discounted_value_3 + discounted_value_4 #- line['price_subtotal']
+            line['price_subtotal'] = sub_value_4 * line.product_uom_qty
+            line['total_discount'] = (line.price_unit * line.product_uom_qty) - line['price_subtotal']
+        #     total_discount_mas += line['total_discount']
+        # self['ks_amount_discount'] = total_discount_mas 
+        
 
-    # Hamza Bhai Code 
-        # for rec in self.order_line:
-        #     rec['total_discount'] = 0
-        #     if rec.product_id:
-        #         disc_amount1 = 0
-        #         disc_amount2 = 0
-        #         disc_amount3 = 0
-        #         if rec.disc_1:
-        #             disc1 =  rec.disc_1 / 100
-        #             disc_amount1 = (rec.price_total-rec.x_studio_sch_value) * disc1
-                
-        #         if rec.disc_2:
-        #             disc2 =  rec.disc_2 / 100
-        #             disc_amount2 = (rec.price_total-rec.x_studio_sch_value-disc_amount1) * disc2
-                    
-        #         if rec.disc_3:
-        #             disc3 =  rec.disc_3 / 100
-        #             disc_amount3 = (rec.price_total-rec.x_studio_sch_value-disc_amount1-disc_amount2) * disc3
-        #         subtotal = disc_amount1 + disc_amount2 + disc_amount3  
-        #         rec['total_discount'] = disc_amount1 + disc_amount2 + disc_amount3
-        #         rec['x_studio_subtotal'] = rec.price_total- subtotal
-        #     else:
-        #         rec['total_discount'] = 0
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'

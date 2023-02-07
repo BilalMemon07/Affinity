@@ -8,7 +8,11 @@ from datetime import datetime
 class Leads(models.Model):
     _inherit = 'crm.lead'
 
-
+    commission=fields.Float(string="Commission %")
+    amount=fields.Float(string="Amount")
+    invoice_status = fields.Selection([
+        ('to_invoice', 'To Invoice'),
+        ], string='Invoice Status', store=True)
     state = fields.Selection([('pending', 'Pending'), ('approve', 'Approved'), ('reject', 'Reject')], string='Status', default='pending')
     product_type = fields.Selection([('1', 'Broker Lending'), ('2', 'Drive Throught Lending'),('3', 'Invoice Discounting')], string='Product Type', required=True) 
     limit_request = fields.Float(string= "limit Request") #for (b)
@@ -133,40 +137,53 @@ class Leads(models.Model):
         lines = []
         commisiionlines = []
         for rec in self:
-            commission_value = 20000
-            income_account = self.env['account.account'].search([('code', '=', "3111001")])
-            # receivable_account = self.env['account.account'].search([('code', '=', "1121001")])
-            commission_account = self.env['account.account'].search([('code', '=', "4311002")])
-            # raise UserError(str(income_account.name) + ', ' + str(receivable_account.name) + ', ' + str(commission_account.name))
-            lines.append((0,0,{
-                'product_id': 1,
-                'account_id' : income_account.id,
-                'quantity':1,
-                'price_unit' : 100000
-            }))
-            commisiionlines.append((0, 0,
-                {
-                'account_id': commission_account.id,
-                'credit': commission_value,
-                'exclude_from_invoice_tab': True
-                }
-            ))
-            move = self.env['account.move'].create({
-            'journal_id': 1,
-            'invoice_date': datetime.now(),
-            'invoice_date_due': datetime.now(),
-            'invoice_line_ids':lines,
-            'move_type':'out_invoice',
-            'partner_id' : rec.partner_id.id,
-            'crm_id': rec.id,
-            })
-            move.with_context(check_move_validity=False).write({
-                'line_ids' : commisiionlines
-            })
-            for line in move.line_ids:
-                if line.account_id == income_account:
-                    line['credit'] = line.credit-commission_value
-                    break
+            if (self.amount <= 0 and self.commission <= 0) or (self.amount <= 0 or self.commission <= 0):    
+                raise UserError('Amount or Commission  less then equal to 0')
+            else:
+                inv = self.env['account.move'].search([('crm_id','=',rec.id)])
+                if inv:
+                    rec['invoice_status'] = False
+                else:
+                    commission_value = 0
+                    income_account = self.env['account.account'].search([('code', '=', "3111001")])
+                    # receivable_account = self.env['account.account'].search([('code', '=', "1121001")])
+                    commission_account = self.env['account.account'].search([('code', '=', "4311002")])
+                    commission_value = (self.amount / 100) * self.commission
+                    lines.append((0,0,{
+                        'product_id': 1,
+                        # 'account_id' : income_account.id,
+                        'quantity':1,
+                        'price_unit' : rec.amount
+                    }))
+                    lines.append((0,0,{
+                        'product_id': 2,
+                        # 'account_id' : income_account.id,
+                        'quantity':1,
+                        'price_unit' : commission_value
+                    }))
+                    # commisiionlines.append((0, 0,
+                    #     {
+                    #     'account_id': commission_account.id,
+                    #     'credit': commission_value,
+                    #     'exclude_from_invoice_tab': True
+                    #     }
+                    # ))
+                    move = self.env['account.move'].with_context(check_move_validity=False).create({
+                    'journal_id': 1,
+                    'invoice_date': datetime.now(),
+                    'invoice_date_due': datetime.now(),
+                    'invoice_line_ids':lines,
+                    'move_type':'out_invoice',
+                    'partner_id' : rec.partner_id.id,
+                    'crm_id': rec.id,
+                    })
+                    # move.with_context(check_move_validity=False).write({
+                    #     'line_ids' : commisiionlines
+                    # })
+                    # for line in move.line_ids:
+                    #     if line.account_id == income_account:
+                    #         line['credit'] = line.credit-commission_value
+                    #         break
  
     
     
@@ -178,6 +195,21 @@ class AccountMove(models.Model):
 
     crm_id = fields.Many2one('crm.lead' , string="CRM")
     disbursement_id = fields.Many2one('account.disbursement' , string="Disbursement")
+    dis_count = fields.Integer(string='Disbursment', compute='get_crm_count')
+
+    def get_crm_count(self):
+        count = self.env['account.disbursement'].search_count([('invoice_id', '=', self.id)])
+        self.dis_count = count
+    def open_disbursment(self):
+        return {
+            'name': 'Disbursement',
+            'domain': [('invoice_id', '=', self.id)],
+            'view_type': 'form',
+            'res_model': 'account.disbursement',
+            'view_id': False,
+            'view_mode': 'tree,form',
+            'type': 'ir.actions.act_window'
+        }
 
     def disbursement_payment(self):
         for rec in self:
@@ -207,8 +239,12 @@ class AccountMove(models.Model):
                     'date':datetime.now() ,
                     # 'payment_method_line_id': 2,#journal.outbound_payment_method_line_ids[0].id,
                     'amount': amount,
+                    'invoice_id' :self.id
                     })
-                # if payment_obj:
+                if payment_obj:
+                    rec.write({
+                        'state' : 'disbursment'
+                    })
                 #     for line in payment_obj.move_id.line_ids:
                 #         if line.account_id.id == 32:
                 #             raise UserError(line.account_id.name)
@@ -228,6 +264,7 @@ class Disbursementmodels(models.Model):
     date=fields.Datetime(string='Date')
     memo=fields.Char(string='Memo')
     journal_id=fields.Many2one('account.journal',string='Journal')
+    invoice_id=fields.Many2one('account.move',string='Invoice')
     bank_vendor_id=fields.Many2one('res.partner.bank',string="Vendor Bank Account")
     payment_method=fields.Selection([('Manual','Manual'),('Checks','Checks')],string="Payment Method",required=True)
 
@@ -284,7 +321,7 @@ class Disbursementmodels(models.Model):
                                 })
                             lines.append(line)
                         
-                            self.env['account.move'].create({
+                            jv =self.env['account.move'].create({
                             'journal_id': rec1.journal_id.id,
                             'date': rec1.date,
                             'line_ids': lines,
@@ -293,6 +330,9 @@ class Disbursementmodels(models.Model):
                             })
                             rec1.write({
                             'state': 'post',
+                            })
+                            jv.write({
+                            'state': 'posted',
                             })
 
     def button_cancel(self):

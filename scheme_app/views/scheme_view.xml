@@ -37,13 +37,19 @@
                                 <button name='onclick_all_brand_line' type='object' string="Fetch Products" />
                             <!-- <field name="value"/> -->
                         </group>
+                        <group>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                            <!-- <field name="value"/> -->
+                        </group>
                     </group>
 
                     <field name="line_id">
                         <tree editable="bottom">
-                            <field name="product_id"/>
-                            <field name="start_date"/>
-                            <field name="end_date"/>
+                            <field name="type" />
+                            <field name="product_id" attrs="{'invisible' : [('type','!=','Product')]}"/>
+                            <field name="brand_id" attrs="{'invisible' : [('type','!=','Brand')]}"/>
+                            <field name="supplier_id" attrs="{'invisible' : [('type','!=','Supplier')]}"/>
                             <field name="market_commission"/>
                             <field name="disc"/>
                             <field name="ditributor_commission"/>
@@ -52,9 +58,10 @@
                         <form>
                             <group>
                                 <group>
+                                    <field name="type"/>
                                     <field name="product_id"/>
-                                    <field name="start_date"/>
-                                    <field name="end_date"/>
+                                    <field name="brand_id" />
+                                    <field name="supplier_id"/>
                                     <field name="market_commission"/>
                                     <field name="disc"/>
                                     <field name="ditributor_commission"/>
