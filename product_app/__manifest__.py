@@ -11,6 +11,8 @@
     'data': [
         'security/ir.model.access.csv',
         'views/views.xml',
+        'wizard/rejection_note.xml',
+        'wizard/disbursement_payment.xml',
         'views/payment_views.xml',
     ],
     'license': 'AGPL-3',

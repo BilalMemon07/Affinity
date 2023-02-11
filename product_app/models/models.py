@@ -8,7 +8,7 @@ from datetime import datetime
 class Leads(models.Model):
     _inherit = 'crm.lead'
 
-    commission=fields.Float(string="Commission %")
+    commission=fields.Float(string="Interest Rate")
     amount=fields.Float(string="Amount")
     invoice_status = fields.Selection([
         ('to_invoice', 'To Invoice'),
@@ -17,8 +17,8 @@ class Leads(models.Model):
     product_type = fields.Selection([('1', 'Broker Lending'), ('2', 'Drive Throught Lending'),('3', 'Invoice Discounting')], string='Product Type', required=True) 
     limit_request = fields.Float(string= "limit Request") #for (b)
     requested_amount = fields.Float(string= "Requested Amount") #for (b/d)
-    instrument_number = fields.Float(string= "Instrument Number") #for (b/d)
-    instrument_number = fields.Float(string= "Instrument Number") #for (b/d)
+    instrument_number = fields.Char(string= "Instrument Number") #for (b/d)
+    instrument_number = fields.Char(string= "Instrument Number") #for (b/d)
     facility_request_date = fields.Date(string= "Facility Request date") #for (b/d/i)
     instrument_due_date = fields.Date(string= "Instrument due date") #for (b/d/i)
     attachment = fields.Binary(string= "Attachment") #for (b/d)
@@ -30,7 +30,7 @@ class Leads(models.Model):
     invoice_amount = fields.Float(string="Invoice Amount") #for (i)
     tag_trip = fields.Float(string="Tag Trip") #for (i)
     invoice_type = fields.Selection([('1', 'Transportation Invoice'), ('2', 'Good Invoice')], string='Invoice Type', required=True) #for (i)
-    description = fields.Text(string="Description") #for (i)
+    description = fields.Text(string="escription") #for (i)
     invoice_attachment = fields.Binary(string= "Upload Invoice") #for (i)
 
     # related_stage_name = fields.Related('stage_id','name', type="char",string="stage")
@@ -97,20 +97,20 @@ class Leads(models.Model):
             self['stage_id'] = 8
         
         
-        # raise UserError("Helllo")
+
 
     def reject_action(self):
         if self.stage_id.id == 1:
             if self.rejection_note:
                 self['state']='reject'
-                self['description'] = str(self.description) + " " + str(self.rejection_note) + ' ' +'('+ str(self.related_stage_name) + ')'
+                self['description'] =  ' ● '+  str(self.rejection_note) + ' ' +'('+ str(self.related_stage_name) + ')' + '\n' 
                 self['rejection_note'] = False
             else:
                 raise UserError('Please Enter The Rejection Note')
         elif self.stage_id.id == 2:
             if self.rejection_note:
                 self['state']='reject'
-                self['description'] = str(self.description) + " " + str(self.rejection_note) + ' ' +'('+ str(self.related_stage_name) + ')'
+                self['description'] =  str(self.description) + " " +'● '+  str(self.rejection_note) + ' ' +'('+ str(self.related_stage_name) + ')' + '\n'  
                 self['rejection_note'] = False
                 self['stage_id'] = 1
                 self['state'] ='pending'
@@ -119,12 +119,31 @@ class Leads(models.Model):
         elif self.stage_id.id == 3:
             if self.rejection_note:
                 self['state']='reject'
-                self['description'] = str(self.description) + " " + str(self.rejection_note) + ' ' + '('+ str(self.related_stage_name) + ')'
+                self['description'] =  str(self.description) + " " +' ● '+  str(self.rejection_note) + ' ' + '('+ str(self.related_stage_name) + ')' + '\n '
                 self['rejection_note'] = False
                 self['stage_id'] = 2
                 self['state'] ='pending'
             else:
                 raise UserError('Please Enter The Rejection Note')
+        elif self.stage_id.id == 7:
+            if self.rejection_note:
+                self['state']='reject'
+                self['description'] =   str(self.description) + " " +' ● '+  str(self.rejection_note) + ' ' + '('+ str(self.related_stage_name) + ')' + '\n '
+                self['rejection_note'] = False
+                self['stage_id'] = 1
+                self['state'] ='pending'
+            else:
+                raise UserError('Please Enter The Rejection Note')
+        elif self.stage_id.id == 8:
+            if self.rejection_note:
+                self['state']='reject'
+                self['description'] =   str(self.description) + " " +' ● '+  str(self.rejection_note) + ' ' + '('+ str(self.related_stage_name) + ')' + '\n '
+                self['rejection_note'] = False
+                self['stage_id'] = 1
+                self['state'] ='pending'
+            else:
+                raise UserError('Please Enter The Rejection Note')
+        
         
         # raise UserError("Helllo")
     @api.onchange('product_type','partner_id')
@@ -136,6 +155,14 @@ class Leads(models.Model):
     def action_create_invoice(self):
         lines = []
         commisiionlines = []
+        product_id = 0
+        if self.product_type == '1':
+            product_id = 3
+        elif self.product_type == '2':
+            product_id = 1
+        days = self.instrument_due_date - self.facility_request_date
+        final_date = str(days).split(" ")[0]
+        
         for rec in self:
             if (self.amount <= 0 and self.commission <= 0) or (self.amount <= 0 or self.commission <= 0):    
                 raise UserError('Amount or Commission  less then equal to 0')
@@ -148,9 +175,10 @@ class Leads(models.Model):
                     income_account = self.env['account.account'].search([('code', '=', "3111001")])
                     # receivable_account = self.env['account.account'].search([('code', '=', "1121001")])
                     commission_account = self.env['account.account'].search([('code', '=', "4311002")])
-                    commission_value = (self.amount / 100) * self.commission
+                    commission_by_day = (self.commission / 30.5) * final_date
+                    commission_value = (self.amount / 100) * commission_by_day
                     lines.append((0,0,{
-                        'product_id': 1,
+                        'product_id':product_id,
                         # 'account_id' : income_account.id,
                         'quantity':1,
                         'price_unit' : rec.amount
@@ -221,6 +249,9 @@ class AccountMove(models.Model):
                     if line.name == "DTL":
                         account_id = line.account_id
                         amount =line.price_subtotal
+                    if line.name == "BL":
+                        account_id = line.account_id
+                        amount =line.price_subtotal
                 # sale_order = rec.env['sale.order'].search([('name','=',rec.invoice_origin)])
                 # delivery_order = rec.env['stock.picking'].search([('origin','=',sale_order.name)])
                 # for dev_line in delivery_order:
@@ -234,7 +265,7 @@ class AccountMove(models.Model):
                     # 'partner_type' : 'customer',
                     # 'destination_account_id' : 32,
                     'memo':rec.name,
-                    'journal_id' : rec.journal_id.id,
+                    'journal_id' : False,
                     'payment_method':"Manual",
                     'date':datetime.now() ,
                     # 'payment_method_line_id': 2,#journal.outbound_payment_method_line_ids[0].id,
@@ -307,7 +338,7 @@ class Disbursementmodels(models.Model):
             if invoice:
                 for inv in invoice:
                     for invline in inv.invoice_line_ids:
-                        if invline.name == "DTL":
+                        if invline.name == "DTL" or invline.name == "BL":
                             
                             line = (0, 0, {
                                 'account_id': 87,

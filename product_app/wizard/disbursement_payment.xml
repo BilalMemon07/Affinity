@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="disbursement_payment_form" model="ir.ui.view">
+        <field name="name">disbursement.payment.form</field>
+        <field name="model">disbursement.payment</field>
+        <field name="arch" type="xml">
+            <form string="Disbursement Payment">
+                <group>
+                    <group>
+                        <field name="journal" options="{'no_open': True, 'no_create': True}"/>
+                        <field name="payment_date"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="create_disbursement" type="object" string="Create Disbursement Payment" class="oe_highlight"/>
+                    <button string="Cancel" class="btn btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="disbursement_payment_wizard" model="ir.actions.act_window">
+        <field name="name">Disbursement Payment</field>
+        <field name="res_model">disbursement.payment</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+
+</odoo>

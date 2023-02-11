@@ -1,2 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_disbursement,access.disbursement,model_account_disbursement,,1,1,1,1
+access_rejection_note,access_rejection_note,model_rejection_note,,1,1,1,1
+access_disbursement_payment,access_disbursement_payment,model_disbursement_payment,,1,1,1,1
