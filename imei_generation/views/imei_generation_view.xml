@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    
+<!-- Tree view -->
+    <record id="view_imei_generation_tree" model="ir.ui.view">
+        <field name="name">imei_generation.tree</field>
+        <field name="model">imei.generation</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" string="Name" />
+                <field name="mobile_name" string="Mobile Name" />
+                <field name="sim_type" string="Sim Type" />
+                <field name="qty" string="Quantity" />
+                
+            </tree>
+        </field>
+    </record>
+    <!-- Form View -->
+    <record id="view_imei_generation_form" model="ir.ui.view">
+        <field name="name">imei_generation.form</field>
+        <field name="model">imei.generation</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" string="Name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="mobile_name" attrs="{'readonly':[('id','!=', False)]}"/>
+                            <field name="sim_type" attrs="{'readonly':[('id','!=', False)]}"/>
+                            <field name="lc_ref" attrs="{'readonly':[('id','!=', False)]}"/>
+                        </group>
+                        <group>
+                            <field name="shipment_reference" attrs="{'readonly':[('id','!=', False)]}"/>
+                            <field name="qty" attrs="{'readonly':[('id','!=', False)]}"/>
+                            <!-- <button type="object" name="add_line_items" string="Verify"></button> -->
+                        </group>
+                    </group>
+                    <field class="mt-5" name="imei_lines" string="Lines">
+                        <tree editable="bottom">
+                            <field name="model_no" readonly="1"/>
+                            <field name="serial_no" readonly="1"/>
+                            <field name="serial_no_barcode" readonly="1" widget="image" />
+                            <field name="imei_1" readonly="1"/>
+                            <field name="imei_1_barcode" readonly="1" widget="image"/>
+                            <field name="imei_2" readonly="1" attrs="{'column_invisible':[('parent.sim_type','=','single_sim')]}"/>
+                            <field name="imei_2_barcode" readonly="1" widget="image" attrs="{'column_invisible':[('parent.sim_type','=','single_sim')]}"/>
+                            <field name="imei_3" readonly="1" attrs="{'column_invisible':['|',('parent.sim_type','=','single_sim'),('parent.sim_type','=','2')]}"/>
+                            <field name="imei_3_barcode" readonly="1" widget="image" attrs="{'column_invisible':['|',('parent.sim_type','=','single_sim'),('parent.sim_type','=','2')]}"/>
+                            <field name="imei_4" readonly="1" attrs="{'column_invisible':['|',('parent.sim_type','=','single_sim'),('parent.sim_type','=','2')]}"/>
+                            <field name="imei_4_barcode" readonly="1" widget="image" attrs="{'column_invisible':['|',('parent.sim_type','=','single_sim'),('parent.sim_type','=','2')]}"/>
+                        </tree>
+                        
+                        <form>
+                            <group>
+                                <group>
+                                    <field name="serial_no" readonly="1" />
+                                    <field name="imei_1" readonly="1"/>
+                                    <field name="imei_2" readonly="1" attrs="{'invisible':[('parent.sim_type','=','single_sim')]}"/>
+                                    <field name="imei_3" readonly="1" attrs="{'invisible':['|',('parent.sim_type','=','single_sim'),('parent.sim_type','=','2')]}"/>
+                                    <field name="imei_4" readonly="1" attrs="{'invisible':['|',('parent.sim_type','=','single_sim'),('parent.sim_type','=','2')]}"  />
+
+                                </group>
+                                <group>
+                                    <field name="serial_no_barcode" readonly="1" widget="image" style="height:10px"/>
+                                    <field name="imei_1_barcode" readonly="1" widget="image"/>
+                                    <field name="imei_2_barcode" readonly="1" widget="image" attrs="{'invisible':[('parent.sim_type','=','single_sim')]}"/>
+                                    <field name="imei_3_barcode" readonly="1" widget="image" attrs="{'invisible':['|',('parent.sim_type','=','single_sim'),('parent.sim_type','=','2')]}"/>
+                                    <field name="imei_4_barcode" readonly="1" widget="image" attrs="{'invisible':['|',('parent.sim_type','=','single_sim'),('parent.sim_type','=','2')]}"/>
+                                </group>
+                            </group>
+                        </form>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- manufacturing -->
+    <record id="view_production_lot_imei_form" model="ir.ui.view">
+        <field name="name">imei.form.inherit</field>
+        <field name="model">stock.lot</field>
+        <field name="inherit_id" ref="stock.view_production_lot_form" />
+        <field name="arch" type="xml">
+            <xpath expr="/form/sheet/group" position="inside">
+             
+                    <group>
+                        <field name="simtype" attrs="{'invisible':1}"/>
+                        <field name="serial_no" readonly="1" />
+                        <field name="imei_1" readonly="1"/>
+                        <field name="imei_2" readonly="1" attrs="{'invisible':[('simtype','=','1')]}"/>
+                        <field name="imei_3" readonly="1" attrs="{'invisible':['|',('simtype','=','1'),('simtype','=','2')]}"/>
+                        <field name="imei_4" readonly="1" attrs="{'invisible':['|',('simtype','=','1'),('simtype','=','2')]}"/>
+                    </group>
+                    <group>
+                        <field name="serial_no_barcode" readonly="1" widget="image"/>
+                        <field name="imei_1_barcode" readonly="1" widget="image"/>
+                        <field name="imei_2_barcode" readonly="1" widget="image" attrs="{'invisible':[('simtype','=','1')]}"/>
+                        <field name="imei_3_barcode" readonly="1" widget="image"  attrs="{'invisible':['|',('simtype','=','1'),('simtype','=','2')]}"/>
+                        <field name="imei_4_barcode" readonly="1" widget="image"  attrs="{'invisible':['|',('simtype','=','1'),('simtype','=','2')]}"/>
+                    </group>
+            </xpath> 
+
+        </field>
+    </record>
+
+
+    <record id="imei_generation_action" model="ir.actions.act_window">
+        <field name="name">IMEI Generation</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">imei.generation</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create Your First Record
+            </p>
+        </field>
+    </record>
+
+
+    <menuitem id="imei_generation_root" name="IMEI Generation" parent="" sequence="10" />
+    <menuitem id="imei_generation" name="IMEI Generation" parent="imei_generation_root"
+        action="imei_generation_action" sequence="10" />
+</odoo>
+
+<!-- stock.view_production_lot_form -->

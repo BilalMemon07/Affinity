@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rejection_note_kyc,access_rejection_note_kyc,model_rejection_note_kyc,,1,1,1,1
+access_multi_documents,access_multi_documents,model_multi_documents,,1,1,1,1

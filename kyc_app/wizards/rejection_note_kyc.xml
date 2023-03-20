@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rejection_note_kyc_form" model="ir.ui.view">
+        <field name="name">rejection.note.kyc.form</field>
+        <field name="model">rejection.note.kyc</field>
+        <field name="arch" type="xml">
+            <form string="Rejection Note">
+                <group>
+                    <group>
+                        <field name="rejection_note"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="reject" type="object" string="Confirm" class="oe_highlight"/>
+                    <button string="Cancel" class="btn btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="rejection_note_kyc_wizard" model="ir.actions.act_window">
+        <field name="name">Rejection Note</field>
+        <field name="res_model">rejection.note.kyc</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+
+</odoo>

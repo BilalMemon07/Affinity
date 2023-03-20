@@ -1,0 +1,1 @@
+from . import rejection_note_kyc

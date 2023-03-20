@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<record id="view_partner_kyc_form_inherit" model="ir.ui.view">
+			<field name="name">res.partner.kyc.form.inherit</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="base.view_partner_form" />
+			<field name="arch" type="xml">
+				<xpath expr="/form/header" position="inside">
+						<field name="state" widget="statusbar" statusbar_visible="approve,DTL_approve,reject,pending"/>
+						<button name="approve_action" states="pending,reject" string="Approve" type="object"/>						
+					<button name="%(kyc_app.rejection_note_kyc_wizard)d" states="pending,approve" string="Reject" type="action"/>						
+				</xpath>
+				<xpath expr="/form/sheet/group/group[1]" position="inside">
+					<field name="vat" invisible="1" />
+					<field name="product_type" />
+					<field name="cnic_number" />
+					<field name="gender" />
+					<field name="mailing_address" />
+					<field name="permanent_address" />
+					<field name="city" />
+					<field name="user_limit" />
+					<field name="province" />
+				</xpath>
+				<xpath expr="/form/sheet/group" position="inside">
+					<group>
+						<field name="father_name" />
+						<field name="region" />
+						<field name="cnic_expiry_date" />
+						<field name="mobile" widget="phone" />
+						<field name="date_of_birth" />
+						<field name="birth_place" />
+					</group>
+				</xpath>
+				<xpath expr="/form/sheet/notebook/page[1]" position="inside">
+					<group>
+						<group>
+							<field name="nature_of_business" />
+							<field name="requestor_income" />
+							<field name="no_of_years" />
+						</group>
+						<group>
+							<field name="rejection_note" />
+							<field name="company_name" />
+							<field name="company_address" />
+						</group>
+					</group>
+				</xpath>
+				<xpath expr="/form/sheet/notebook" position="inside">
+					<page name="digital_doc" string="Digital Document">
+						<group>
+							<group>
+								<field name="cnic_front" widget="image" string="CNIC Front" />
+								<field name="cnic_back" widget="image" string="CNIC Back" />
+							</group>
+							<group>
+								<field name="customer_image" widget="image" string="customer_image" />
+								<field name="security_cheque" widget="image" string="Security Cheque" />
+							</group>
+						</group>
+					</page>
+				</xpath>
+				<xpath expr="/form/sheet/notebook" position="inside">
+					<page name="multiple_doc" string="Multiple Document">
+						<field class="mt-5" name="multi_document_lines" string="Multi Documents Lines">
+							<tree editable="bottom">
+								<field name="uploader_name" />
+								<field name="url" />
+								<field name="description" />
+								<field name="date" />
+							</tree>
+							<form>
+								<group>
+									<group>
+										<field name="uploader_name" />
+										<field name="url" />
+									</group>
+									<group>
+										<field name="description" />
+										<field name="date" />
+									</group>
+								</group>
+							</form>
+						</field>
+					</page>
+				</xpath>
+			</field>
+		</record>
+	</data>
+</odoo>

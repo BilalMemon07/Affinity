@@ -7,33 +7,38 @@
 			<field name="inherit_id" ref="crm.crm_lead_view_form" />
 			<field name="arch" type="xml">
 				<xpath expr="/form/header" position="before">
-					<header>	
+					<header>
 						<field name="state" widget="statusbar" statusbar_visible="approve,reject,pending"/>
 					</header>
 				</xpath>
 				<xpath expr="/form/sheet/div/button[1]" position="before">
 					<!-- <div class="o_stat_info" name="button_box">
-                    	<button name="open_patient_appointment" type="object" class="oe_stat_button" icon="fa-book">
-                            <field name="crm_count" string="Invoice" widget="statinfo"/>
-                    	</button>
+					<button name="open_patient_appointment" type="object" class="oe_stat_button" icon="fa-book">
+					<field name="crm_count" string="Invoice" widget="statinfo"/>
+					</button>
                     </div> -->
 					<button name="open_patient_appointment" type="object" class="oe_stat_button" icon="fa-book" attrs="{'invisible': [('type', '=', 'lead')]}">
 						<div class="o_stat_info">
 							<field name="crm_count" class="o_stat_value" string="Invoice"/>
 							<span class="o_stat_text">Invoice</span>
 						</div>
-                    </button>
+					</button>
 				</xpath>
+
 				<xpath expr="/form/header[1]" position="inside">
 					<button name="approve_action" states="pending,reject" string="Approve" type="object"/>						
 					<button name="%(product_app.rejection_note_wizard)d" states="pending,approve" string="Reject" type="action"/>						
-					<button name="action_create_invoice" states="approve" string="Create Invoice" type="object" attr="{'invisible':[('invoice_status','=','to_invoice')]}"/>						
+					<button name="action_create_invoice" states="approve" string="Create Invoice" type="object" attr="{'invisible':[('crm_count','=',1)]}"/>						
 				</xpath>
 				<xpath expr="/form/sheet/group" position="before">
 					<group>
 						<group>
 							<field name="related_stage_name"/>
 							<field name="product_type"/>
+							<field name="invoice_id"/>
+							<field name="disbursment_id"/>
+							<!-- <field name="invoice_state"/>
+							<field name="disbursement_state"/> -->
 						</group>
 					</group>
 				</xpath>
@@ -66,7 +71,8 @@
 				</xpath>
 				<!-- For Risk and compliance Tab -->
 				<xpath expr="/form/sheet/notebook" position="inside" >
-					<page name="risk_tab" string="Risk and Compliance"  attrs="{'invisible':[('related_stage_name','=', 'Business Team')]}">
+					<page name="risk_tab" string="Risk and Compliance
+					"  attrs="{'invisible':[('related_stage_name','=', 'Business Team')]}">
 						<group>
 							<group>
 								<field name="kyc_check"/>
@@ -124,6 +130,266 @@
 						</group>
 					</page>
 				</xpath>
+				<xpath expr="/form/sheet/notebook" position="inside">
+				    <page name="risk" string="Risk Calculator ">
+				        <group>
+				            <div class="row">
+				                <div class="col-12">
+				                    <div class="row">
+				                        <div class="col-3">
+				                            <h3>Risk Factors</h3>
+				                        </div>
+				                        <div class="col-3">
+				                            <h3>Risk Variable</h3>
+				                        </div>
+				                        <div class="col-2">
+				                            <h3>Score</h3>
+				                        </div>
+				                        <div class="col-2">
+				                            <h3>Weight</h3>
+				                        </div>
+				                        <div class="col-2">
+				                            <h3>Weighted Score</h3>
+				                        </div>
+				                    </div>
+				                </div>
+				                <div class="col-12">
+				                    <div class="row">
+				                        <div class="col-3">
+											Company Structure	
+										</div>
+				                        <div class="col-3">
+				                            <field name="company_structure" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="company_score" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="company_weight" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="company_weighted" />
+				                        </div>
+				                    </div>
+				                </div>
+				                <div class="col-12">
+				                    <div class="row">
+				                        <div class="col-3">
+											Business Type
+										</div>
+				                        <div class="col-3">
+				                            <field name="business_type" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="business_score" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="business_weight" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="business_weighted" />
+				                        </div>
+				                    </div>
+				                </div>
+				                <div class="col-12">
+				                    <div class="row">
+									<div class="col-3">
+											Monthly Revenue
+										</div>
+				                        <div class="col-3">
+				                            <field name="monthly_revenue" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="revenue_score" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="revenue_weight" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="revenue_weighted" />
+				                        </div>
+				                    </div>
+				                </div>
+				                <div class="col-12">
+				                    <div class="row">
+									<div class="col-3">
+									No Of Years	
+									</div>
+				                        <div class="col-3">
+				                            <field name="no_of_years" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="years_score" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="years_weight" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="years_weighted" />
+				                        </div>
+				                    </div>
+				                </div>
+				                <div class="col-12">
+				                    <div class="row">
+									<div class="col-3">
+											Customer Type
+										</div>
+				                        <div class="col-3">
+				                            <field name="customer_type" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="customer_score" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="customer_weight" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="customer_weighted" />
+				                        </div>
+				                    </div>
+				                </div>
+				                <div class="col-12">
+				                    <div class="row">
+									<div class="col-3">
+											PEP
+										</div>
+				                        <div class="col-3">
+				                            <field name="pep" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="pep_score" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="pep_weight" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="pep_weighted" />
+				                        </div>
+				                    </div>
+				                </div>
+				                <div class="col-12">
+				                    <div class="row">
+									<div class="col-3">
+											Availability Of Bank Statement
+										</div>
+				                        <div class="col-3">
+				                            <field name="availability_of_bank_statement" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="statement_score" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="statement_weight" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="statement_weighted" />
+				                        </div>
+				                    </div>
+				                </div>
+				                <div class="col-12">
+				                    <div class="row">
+									<div class="col-3">
+										Repayment History
+										</div>
+				                        <div class="col-3">
+				                            <field name="repayment_history" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="repayment_score" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="repayment_weight" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="repayment_weighted" />
+				                        </div>
+				                    </div>
+				                </div>
+				                <div class="col-12">
+				                    <div class="row">
+									<div class="col-3">
+											Truck Ownershp
+										</div>
+				                        <div class="col-3">
+				                            <field name="truck_ownership" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="truck_score" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="truck_weight" />
+				                        </div>
+				                        <div class="col-2">
+				                            <field name="truck_weighted" />
+				                        </div>
+				                    </div>
+				                </div>
+								<div class="col-12">
+									<div class="row">
+									<div class="col-8"></div>
+										<div class="col-2 ">
+										<field name="total_weight" />
+										</div>
+									</div>
+								</div>
+								
+							<div class="col-12">
+								<div class="row">
+									<div class="col-8">
+										<button class="oe_highlight" name="risk_calculation" type="object" attrs="{'invisible':[('related_stage_name','=', 'Business Team')]}">
+											Apply Score Calculation
+										</button>
+									</div>
+									<div class="col-2 ">
+										<h5>Total Weighted Score</h5>
+									</div>
+									<div class="col-2">
+										<field name="total_weighted" />
+									</div>
+								</div>
+							</div>
+							<div class="col-12 mt-5">
+								<div class="row">
+									<div class="col-8">
+											
+									</div>
+									<div class="col-2 ">
+										<h5>Risk Level</h5>
+									</div>
+									<div class="col-2 ">
+										<field name="risk_level" />
+									</div>
+								</div>
+							</div>		
+				        </div>
+				        </group>
+				    </page>
+				</xpath>
+				<xpath expr="/form/sheet/notebook" position="inside">
+					<page name="multiple_doc" string="Multiple Document">
+						<field class="mt-5" name="multi_document_lines" string="Multi Documents Lines">
+							<tree editable="bottom">
+								<field name="uploader_name" />
+								<field name="url" />
+								<field name="description" />
+								<field name="date" />
+							</tree>
+							<form>
+								<group>
+									<group>
+										<field name="uploader_name" />
+										<field name="url" />
+									</group>
+									<group>
+										<field name="description" />
+										<field name="date" />
+									</group>
+								</group>
+							</form>
+						</field>
+					</page>
+				</xpath>
+				
 			</field>
 		</record>
 		<record id="view_crm_kanban_form_inherit" model="ir.ui.view">
@@ -145,34 +411,45 @@
 				<xpath expr="/kanban/templates/t/div/div[3]/div[4]" position="after">
 					<div>
                         <field name="product_type"/>
-                    </div>
+					</div>
 				</xpath>
 			</field>
 		</record>
-
 		<record id="view_account_move_inherit" model="ir.ui.view">
 			<field name="name">view_account_move_inherit</field>
 			<field name="model">account.move</field>
 			<field name="inherit_id" ref="account.view_move_form" />
 			<field name="arch" type="xml">
 				<xpath expr="/form/header" position="inside">
-					<button name="%(product_app.disbursement_payment_wizard)d" string="Disbursement Payment" class="oe_highlight" type="action"  attrs="{'invisible': [('dis_count','=',1)]}"/>
+					<button name="%(product_app.disbursement_payment_wizard)d" string="Disbursement Payment" class="oe_highlight" type="action"  attrs="{'invisible': ['|',('move_type', '!=', 'out_invoice'),('dis_count','=',1)]}"/>
 				</xpath>
 				<xpath expr="/form/sheet/div/button[1]" position="before">
 					<!-- <div class="o_stat_info" name="button_box">
-                    	<button name="open_patient_appointment" type="object" class="oe_stat_button" icon="fa-book">
-                            <field name="crm_count" string="Invoice" widget="statinfo"/>
-                    	</button>
+					<button name="open_patient_appointment" type="object" class="oe_stat_button" icon="fa-book">
+					<field name="crm_count" string="Invoice" widget="statinfo"/>
+					</button>
                     </div> -->
 					<button name="open_disbursment" type="object" class="oe_stat_button" icon="fa-book" attrs="{'invisible': [('move_type', '!=', 'out_invoice')]}">
 						<div class="o_stat_info">
 							<field name="dis_count" class="o_stat_value" string="Invoice"/>
 							<span class="o_stat_text">Disbursment</span>
 						</div>
-                    </button>
+					</button>
 				</xpath>
 			</field>
 		</record>
+
+	<!--product template view inherit-->
+        <record id="product_template_off_form_inherit" model="ir.ui.view">
+            <field name="name">product.template.off.form.inherit</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <field name="property_account_income_id" position="after">
+                    <field name="interest_account_id" string="Interest Account"/>
+                </field>
+            </field>
+        </record>
 
 
 

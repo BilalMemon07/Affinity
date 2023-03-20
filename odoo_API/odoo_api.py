@@ -3,6 +3,7 @@ from logging import exception
 from flask import Flask, Response, jsonify, request
 import xmlrpc.client
 import random
+import datetime
 
 
 dbData = ["url", "db", "dbusername", "dbpassword"]
@@ -89,7 +90,7 @@ def login():
 
 
 @app.route(url_prefix + 'createCustomer', methods=['POST'])
-def createSaleOrder():
+def createCustomer():
     record = json.loads(request.data)
     try:
         global authToken
@@ -100,8 +101,7 @@ def createSaleOrder():
             if customer_search:
                 return Response('User Already Exist, You Can not add This User 2nd Time', status=400, mimetype='application/json')
             id = models.execute_kw(login_data['db'], uid, login_data['dbpassword'], 'res.partner', 'create', [{
-                "customer_name":record['customer_name'],
-                "name":record['customer_name'],
+                "name":record['name'],
                 "gender":record['gender'],
                 "mobile": record['mobile'],
                 "cnic_number":record['cnic_number'],
@@ -134,8 +134,95 @@ def createSaleOrder():
 
 
 
+
+@app.route(url_prefix + 'getCustomer/<id>', methods=['GET'])
+def getCustomerbyID(id):
+    try:
+        _id = int(id)
+        global authToken
+        res = authentication(authToken)
+        if not _id:
+            return Response('Record Number Must be Required in Url ', status=404, mimetype='application/json')
+        if res == True:
+            data = models.execute_kw(login_data['db'], uid, login_data['dbpassword'], 'res.partner', 'search_read', [
+                                     [['id', '=', _id]]])
+            return jsonify(data)
+        else:
+            return Response(res, status=400, mimetype='application/json')
+    except Exception as ex:
+        print('Sorry, something went wrong!')
+        return Response('Sorry, something went wrong!' + ' ' + str(ex), status=400, mimetype='application/json')
+
+
+
+#  db_url = request.args.get('db_url')
+#     db_name = request.args.get('db_name')
+
+@app.route(url_prefix + 'searchLead', methods=['GET'])
+def getLeadbysearch():
+    try:
+        product_list = ['1','2','3']
+        status_list =  ['pending','approve','reject']
+        product_type = False
+        status = False
+        to_date = str(datetime.datetime(2000, 1, 1)).split(" ")[0]
+        from_date = str(datetime.datetime.now()).split(" ")[0]
+        product_type = request.args.get('product_type')
+        if product_type:
+            product_list = [product_type]
+        status = request.args.get('status')
+        if status:
+            status_list = [status]
+        requested_date = request.args.get('requestedDate')
+        # if requested_date:
+        #     to_date = requested_date
+        due_date = request.args.get('dueDate')
+        # if due_date:
+        #     from_date = due_date
+        # status = request.args.get('status')
+        global authToken
+        res = authentication(authToken)
+        _product_type = product_list
+        _status = status_list
+        _requested_date_to = to_date
+        __due_date_from = from_date
+        # form and to date condistion 
+        # ['facility_request_date','>=', _requested_date_to],['instrument_due_date','<=', __due_date_from]
+        # remamaining work in date search in odoo api
+
+        if res == True:
+            data = models.execute_kw(login_data['db'], uid, login_data['dbpassword'], 'crm.lead', 'search_read', [[['product_type','in',_product_type],['state','in',_status],]],{'fields': ['create_date','product_type','state','requested_amount','amount']})
+            return jsonify(data)
+        else:
+            return Response(res, status=400, mimetype='application/json')
+    except Exception as ex:
+        print('Sorry, something went wrong!')
+        return Response('Sorry, something went wrong!' + ' ' + str(ex), status=400, mimetype='application/json')
+
+
+
+@app.route(url_prefix + 'getLeads/<id>', methods=['GET'])
+def getLeadbyProductType(id):
+    try:
+        _id = int(id)
+        global authToken
+        res = authentication(authToken)
+        if not _id:
+            return Response('Record Number Must be Required in Url ', status=404, mimetype='application/json')
+        if res == True:
+            data = models.execute_kw(login_data['db'], uid, login_data['dbpassword'], 'crm.lead', 'search_read', [
+                                     [['id', '=', _id]]])
+            return jsonify(data)
+        else:
+            return Response(res, status=400, mimetype='application/json')
+    except Exception as ex:
+        print('Sorry, something went wrong!')
+        return Response('Sorry, something went wrong!' + ' ' + str(ex), status=400, mimetype='application/json')
+
+
+
 @app.route(url_prefix + 'updateCustomer/<id>', methods=['POST'])
-def updatesalesorder(id):
+def updateCustomer(id):
     record = json.loads(request.data)
     try:
         customer_id = int(id)
@@ -256,7 +343,6 @@ def updateProduct(id):
 def SearchCutomer():
     record = json.loads(request.data)
     try:
-        product_id = int(id)
         global authToken
         res = authentication(authToken)
         if res == True:
@@ -289,27 +375,3 @@ if __name__ == '__main__':
     app.run(host="0.0.0.0", port="5000")
     # from waitress import serve
     # serve(app,host='0.0.0.0',port=5000)
-
-
-
-
-# "gender":"male",
-# "mobile":false,
-# "cnic_number":"e1231eqweqwe",
-# "father_name":"AKkkss",
-# "cnic_expiry_date":false,
-# "date_of_birth":false,
-# "birth_place":"karachi",
-# "mailing_address":"hello",
-# "permanent_address":"dadasd",
-# "city":"adadad",
-# "province":"dasdasd",
-# "nature_of_business":"dadasdasd",
-# "requestor_income":false,
-# "no_of_years":false,
-# "company_name":"asd",
-# "company_address":"dasda",
-# "cnic_front":false,
-# "cnic_back":false,
-# "security_cheque":false,
-# "customer_image":false

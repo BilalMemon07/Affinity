@@ -16,6 +16,9 @@ class DisbursementPayment(models.TransientModel):
             )
             invoice.disbursement_payment()
             disbursement = self.env['account.disbursement'].search([('invoice_id','=', invoice.id)])
+            invoice.crm_id['disbursment_id'] = disbursement.id
+            invoice.crm_id['disbursement_state'] = disbursement.state
+
             # raise UserError(disbursement)
             for dis in disbursement:
                 dis.write({
