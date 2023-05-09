@@ -21,4 +21,5 @@
 #############################################################################
 from . import rejection_note
 from . import disbursement_payment
+from . import register_payment
 

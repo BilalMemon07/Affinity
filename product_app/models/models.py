@@ -7,21 +7,22 @@ from datetime import datetime
 
 class Leads(models.Model):
     _inherit = 'crm.lead'
-
+    
     commission=fields.Float(string="Interest Rate")
     amount=fields.Float(string="Amount")
     invoice_status = fields.Selection([
         ('to_invoice', 'To Invoice'),
         ], string='Invoice Status', store=True)
     state = fields.Selection([('pending', 'Pending'), ('approve', 'Approved'), ('reject', 'Reject')], string='Status', default='pending')
-    product_type = fields.Selection([('1', 'Broker Lending'), ('2', 'Drive Throught Lending'),('3', 'Invoice Discounting')], string='Product Type', required=True) 
+    product_type = fields.Selection([('1', 'Working capital Financing'), ('2', 'Drive Throught Lending'),('3', 'Invoice Discounting')], string='Product Type', required=True) 
     limit_request = fields.Float(string= "limit Request") #for (b)
     requested_amount = fields.Float(string= "Requested Amount") #for (b/d)
     instrument_number = fields.Char(string= "Instrument Number") #for (b/d)
     instrument_number = fields.Char(string= "Instrument Number") #for (b/d)
     facility_request_date = fields.Date(string= "Facility Request date") #for (b/d/i)
-    instrument_due_date = fields.Date(string= "Instrument due date") #for (b/d/i)
+    instrument_due_date = fields.Date(string= "Facility due date") #for (b/d/i)
     attachment = fields.Binary(string= "Attachment") #for (b/d)
+    attachment_name = fields.Char(string= "Attachment") #for (b/d)
 
     interest_rate = fields.Float(string= "Interest Rate") 
 
@@ -32,15 +33,20 @@ class Leads(models.Model):
     invoice_type = fields.Selection([('1', 'Transportation Invoice'), ('2', 'Good Invoice')], string='Invoice Type') #for (i)
     description = fields.Text(string="escription") #for (i)
     invoice_attachment = fields.Binary(string= "Upload Invoice") #for (i)
+    invoice_attachment_name = fields.Char(string= "Upload Invoice") #for (i)
 
     # related_stage_name = fields.Related('stage_id','name', type="char",string="stage")
     related_stage_name = fields.Char(string='stage', related='stage_id.name')
+    related_team_id = fields.Char(string='Team', related='team_id.name')
 
 
     # for Business Team 
     bank_attachment = fields.Binary(string= "Bank Attactment")
+    bank_attachment_name = fields.Char(string= "Bank Attactment")
     trip_data = fields.Binary(string= "Trip Data")
+    trip_data_name = fields.Char(string= "Trip Data")
     ownership_doc = fields.Binary(string= "Truck Ownership")
+    ownership_doc_name = fields.Char(string= "Truck Ownership")
     # for Business Team & Risk & Compliance
 
     kyc_check = fields.Boolean(string = 'Kyc check with NADRA')
@@ -107,16 +113,143 @@ class Leads(models.Model):
 
     # Extra Fields 
     risk_level = fields.Char(string = "Risk Level" , readonly = True)
-    multi_document_lines = fields.One2many('multi.documents', 'crm_id', string='Multi Documents Lines')
     invoice_id = fields.Many2one('account.move', string="Invoice")
     disbursment_id = fields.Many2one('account.disbursement', string="Disbursment")
     invoice_state = fields.Selection( string='Invoice State', related='invoice_id.state') 
-    disbursement_state = fields.Selection( string='Disbursment State', related='disbursment_id.state') 
+    disbursement_state = fields.Selection( string='Disbursment State', related='disbursment_id.state')
+    multi_document_lines = fields.One2many('multi.documents.crm', 'crm_id', string='Multi Documents Lines')
+
+
+
+
+    # **************************** Fields For Customer Pipeline **************************************
+    #              ****************General Information Fields ********************************
+
+    customer_name = fields.Char(string='Customer/CEO Name (As per CNIC)', )
+    gender = fields.Selection([('male', 'Male'), ('female', 'Female')], string='Gender', )
+    cnic_number = fields.Char(string='CNIC Number')
+    father_name = fields.Char(string='Father Name')
+    cnic_expiry_date = fields.Date(string='CNIC Expiry Date')
+    date_of_birth = fields.Date(string='Date of Birth')
+    birth_place = fields.Char(string='Birth Place')
+    mailing_address = fields.Char(string='Mailing Address')
+    permanent_address = fields.Char(string='Permanent Address')
+    city = fields.Char(string='City')
+    province = fields.Char(string='Provice')
+    ntn_number = fields.Char(string='NTN Number')
+    ownership_struture = fields.Selection([('sole_owner', 'Sole Owner'), ('partnership', 'partnership'),('registered_company', 'Registered Company')], string='Ownership Structure' )
+    business_development_officer = fields.Selection([('Jawwad', 'Jawwad'), ('Bilal', 'Bilal'),('Hasan', 'Hasan'),('kasra', 'kasra')], string='Business Development Officer' )
+    supervising_manager = fields.Selection([('Jawwad', 'Jawwad'), ('Bilal', 'Bilal'),('Hasan', 'Hasan'),('kasra', 'kasra')], string='Supervising Manager' )
+    
+    instrument_lines = fields.One2many('instrument', 'crm_id', string='Instrument Lines')
+
+    # #              ****************Business Information Fields ********************************
+
+    nature_of_business = fields.Char(string='Nature of Business')
+    requestor_income = fields.Float(string= "Requestor's Income (Monthly)")
+    no_of_years = fields.Integer(string= "No of years in Business" )
+    company_name = fields.Char(string= "Company Name" )
+    company_address = fields.Char(string= "Company Address" )
+    other_sources_of_income = fields.Char(string= "Other sources of income" )
+    
+    # #              ****************Business Information Fields ********************************
+
+    key_personnel_details_lines = fields.One2many('key.personnel.details', 'crm_id', string='Key Personnel Details Lines')
+    authorized_signatory_details_lines = fields.One2many('authorized.signatory.details', 'crm_id', string='Authorized Signatory Details Lines')
+    details_of_director_share_holder_lines = fields.One2many('details.of.director.share.holder', 'crm_id', string='Details Of Director / Share Holder Lines')
+
+    
+    
+    # #              ****************Invoice Discounting Loan Fields ********************************
+    
+    requested_loan_amount = fields.Float(string="Requested Loan Amount")
+    approved_loan_amount = fields.Float(string="Approved Loan Amount")
+    applicable_interest_rate = fields.Float(string="Applicable Interest Rate")
+    approved_interest_rate = fields.Float(string="Approved Interest Rate")
+    approved_limit = fields.Float(string="Approved Limit")
+    principal_outstanding = fields.Float(string="Principal Outstanding")
+    interest_outstanding = fields.Float(string="Interest Outstanding")
+    total_receivable_amount = fields.Float(string="Total Receivable Amount")
+    tenor = fields.Integer(string="Tenor")
+    invoice_numbr = fields.Char(string="Invoice Number")
+    attach_invoices = fields.Binary(string="Attach Invoices")
+    attach_invoices_name = fields.Char(string="Attach Invoices")
+    No_of_blts = fields.Float(string="No. of BLTs")
+    underwriting_authority = fields.Selection([('Meezan Bank Limited', 'Meezan Bank Limited'), ('Bank Al Habib', 'Bank Al Habib'),('Trukkr Financial Services', 'Trukkr Financial Services')],string="Underwriting authority")
+    Attach_BLTs = fields.Binary(string="Attach BLTs")
+    Attach_BLTs_name = fields.Char(string="Attach BLTs")
+    
+    
+    @api.onchange("product_type")
+    def check_customer_approve(self):
+        if self.partner_id:
+            if self.product_type:
+                if self.product_type == "1" and self.partner_id.approve_for_BL == False:
+                    pass
+                elif self.product_type == "2" and self.partner_id.approve_for_DTL == False:
+                    pass
+                elif self.product_type == "3" and self.partner_id.approve_for_ID == False:
+                    pass
+                else:
+                    self._fields['product_type'].string
+                    raise UserError(str(dict(self._fields['product_type'].selection).get(self.product_type)) + " is already approve please select another")
+
+    @api.onchange("partner_id")
+    def partner_details(self):
+        if self.partner_id:
+            if self.product_type == 3:
+                self['applicable_interest_rate'] = self.partner_id.approved_interest_rate
+                self['approved_interest_rate'] = self.partner_id.approved_interest_rate
+                self['approved_limit'] = self.partner_id.approved_limit
+                self['underwriting_authority'] = self.partner_id.default_under_writing_authority
+            elif self.product_type == 2:
+                self['applicable_interest_rate'] = self.partner_id.approved_interest_rate_dtl
+                self['approved_interest_rate'] = self.partner_id.approved_interest_rate_tdl
+                self['approved_limit'] = self.partner_id.approved_limit_dtl
+                self['underwriting_authority'] = self.partner_id.default_under_writing_authority_dtl
+            elif self.product_type == 1:
+                self['applicable_interest_rate'] = self.partner_id.approved_interest_rate_wl
+                self['approved_interest_rate'] = self.partner_id.approved_interest_rate_wl
+                self['approved_limit'] = self.partner_id.approved_limit_wl
+                self['underwriting_authority'] = self.partner_id.default_under_writing_authority_wl
+
+            self['customer_name'] = self.partner_id.name
+            self['gender'] = self.partner_id.gender
+            self['cnic_number'] = self.partner_id.cnic_number
+            self['father_name'] = self.partner_id.father_name
+            self['cnic_expiry_date'] = self.partner_id.cnic_expiry_date
+            self['date_of_birth'] = self.partner_id.date_of_birth
+            self['birth_place'] = self.partner_id.birth_place
+            self['mailing_address'] = self.partner_id.mailing_address
+            self['permanent_address'] = self.partner_id.permanent_address
+            self['city'] = self.partner_id.city
+            self['province'] = self.partner_id.province
+            self['nature_of_business'] = self.partner_id.nature_of_business
+            self['requestor_income'] = self.partner_id.requestor_income
+            self['no_of_years'] = self.partner_id.no_of_years
+            self['company_name'] = self.partner_id.company_name
+            self['company_address'] = self.partner_id.company_address
+
+
 
 
     def get_crm_count(self):
         count = self.env['account.move'].search_count([('crm_id', '=', self.id)])
         self.crm_count = count  
+    @api.onchange("instrument_due_date","facility_request_date")
+    def calculate_tenor(self):
+        if self.instrument_due_date and self.facility_request_date:
+            tenor = self['instrument_due_date'] - self['facility_request_date']
+            final_date = str(tenor).split(" ")[0]
+            self['tenor'] = float(final_date) 
+
+    @api.onchange("approved_loan_amount","applicable_interest_rate","tenor")
+    def calculate_total_receivable(self):
+        if self.tenor:
+            connission = self['approved_loan_amount'] * (self['applicable_interest_rate'] / 100)
+            total = connission * self['tenor']
+            self['total_receivable_amount'] = total
+
 
     def open_patient_appointment(self):
         return {
@@ -137,24 +270,133 @@ class Leads(models.Model):
         return res
 
 
+    # def approve_action(self):
+    #     if self.team_id.id == 1:
+    #         # if self.product_type == '1' or self.product_type == '3':
+    #         crm_lead = self.env['crm.lead'].search([('partner_id','=', self.partner_id.id),('team_id','=', 5)])
+    #         # raise UserError(crm_lead)
+            
+    #         if self.product_type == '1':
+    #             if crm_lead.stage_id.id == 7:
+    #                 self['stage_id'] = 4
+    #                 self['state'] = 'approve'
+    #         elif self.product_type == '2':
+    #             if crm_lead.stage_id.id == 7:
+    #                 self['stage_id'] = 5
+    #                 self['state'] = 'approve'
+                
+    #         elif self.product_type == '3':
+    #             if crm_lead.stage_id.id == 7:
+    #                 self['stage_id'] = 4
+    #                 self['state'] = 'approve'
+    #                 # self['state'] ='pending'
+    #         # else:
+    #         #     self['state'] = 'approve'
+    #         #     self['stage_id'] = 5
+    #     elif self.team_id.id == 5:
+    #         # raise UserError(self.team_id.id)
+    #         if self.stage_id.id == 6: 
+    #             self['state'] = 'approve'
+    #             self['stage_id'] = 7
+    #             self['state'] ='pending'
+    #         elif self.stage_id.id == 7:
+    #             self['state'] = 'approve'
+    #             # raise UserError("Hello")
+    #             if self.state == "approve":
+    #                 if self.team_id.id == 5:
+    #                     if self.stage_id.id == 7: 
+    #                         obj = {
+    #                         'name': self.name,
+    #                         }
+    #                         customer = self.env['res.partner'].create(obj)
+    #                         if customer:
+    #                             self['partner_id'] = customer.id
+    
     def approve_action(self):
-        if self.product_type == '1' or self.product_type == '3':
-            if self.stage_id.id == 1: 
+        if self.team_id.id == 1:
+            if self.product_type == '1' or self.product_type == '3':
+                if self.product_type == '1': 
+                    if self.stage_id.id == 1: 
+                        self['state'] = 'approve'
+                        self['stage_id'] = 2
+                        self['state'] ='pending'
+                    elif self.stage_id.id == 2:
+                        self['state'] = 'approve'
+                        self['stage_id'] = 3
+                        self['state'] ='pending'
+                    elif self.stage_id.id == 3:
+                        self['state'] = 'approve'
+                        self['stage_id'] = 4
+                if self.product_type == '3':  
+                    if self.stage_id.id == 1: 
+                        self['state'] = 'approve'
+                        self['stage_id'] = 2
+                        self['state'] ='pending'
+                    elif self.stage_id.id == 2:
+                        self['state'] = 'approve'
+                        self['stage_id'] = 3
+                        self['state'] ='pending'
+                    elif self.stage_id.id == 3:
+                        self['state'] = 'approve'
+                        self['stage_id'] = 8
+                    # self['state'] ='pending'
+            else:
                 self['state'] = 'approve'
-                self['stage_id'] = 2
-                self['state'] ='pending'
-            elif self.stage_id.id == 2:
+                self['stage_id'] = 5
+        elif self.team_id.id == 5:
+            if self.product_type == '1' or self.product_type == '3':
+                if self.stage_id.id == 11: 
+                    self['state'] = 'approve'
+                    self['stage_id'] = 12
+                    self['state'] ='pending'
+                elif self.stage_id.id == 12: 
+                    self['state'] = 'approve'
+                    self['stage_id'] = 13
+                    self['state'] ='pending'
+                elif self.stage_id.id == 13:
+                    if self.product_type == '1':
+                        self['stage_id'] = 6
+                        self['state'] = 'approve'
+                    elif self.product_type == "3":
+                        self['stage_id'] = 10
+                        self['state'] = 'approve'                             
+                    # raise UserError("Hello")
+            else:
                 self['state'] = 'approve'
-                self['stage_id'] = 3
-                self['state'] ='pending'
-            elif self.stage_id.id == 3:
-                self['state'] = 'approve'
-                self['stage_id'] = 4
-                # self['state'] ='pending'
-        else:
-            self['state'] = 'approve'
-            self['stage_id'] = 5
-        
+                self['stage_id'] = 7
+
+            if not self['partner_id']:
+                if self.state == "approve":
+                    if self.stage_id.id == 10 or self.stage_id.id == 6 or self.stage_id.id == 7: 
+                        obj = {
+                        'name': self.customer_name,
+                        'gender': self.gender,
+                        'cnic_number':self.cnic_number,
+                        'father_name':self.father_name,
+                        'cnic_expiry_date':self.cnic_expiry_date,
+                        'date_of_birth':self.date_of_birth,
+                        'birth_place':self.birth_place,
+                        'mailing_address':self.mailing_address,
+                        'permanent_address':self.permanent_address,
+                        'city':self.city,
+                        'province':self.province,
+                        # company Information
+                        'nature_of_business':self.nature_of_business,
+                        'requestor_income':self.requestor_income,
+                        'no_of_years':self.no_of_years,
+                        'company_name':self.company_name,
+                        'company_address':self.company_address,
+                        }
+                        customer = self.env['res.partner'].create(obj)
+                        if customer:
+                            self['partner_id'] = customer.id
+            if self.stage_id.id == 6:
+                self['partner_id']['approve_for_BL'] = True
+            elif self.stage_id.id == 7:
+                self['partner_id']['approve_for_DTL'] = True
+            elif self.stage_id.id == 10:
+                self['partner_id']['approve_for_ID'] = True
+
     def risk_calculation(self):
         total_weight = 0
         total_weighted = 0
@@ -225,91 +467,99 @@ class Leads(models.Model):
             self['risk_level'] = "Low Risk"
 
     def reject_action(self):
-
-        if self.stage_id.id == 1:
-            if self.rejection_note:
-                self['state']='reject'
-                self['description'] =  ' ● '+  str(self.rejection_note) + ' ' +'('+ str(self.related_stage_name) + ')' + '\n' 
-                self['rejection_note'] = False
-            else:
-                raise UserError('Please Enter The Rejection Note')
-        elif self.stage_id.id == 2:
-            self['company_structure'] = False
-            self['business_type'] = False
-            self['monthly_revenue'] = False
-            self['no_of_years'] = False
-            self['customer_type'] = False
-            self['pep'] = False
-            self['availability_of_bank_statement'] = False
-            self['repayment_history'] = False
-            self['truck_ownership'] = False
-            self['company_score'] = 0
-            self['business_score'] = 0
-            self['revenue_score'] = 0
-            self['years_score'] = 0
-            self['customer_score'] = 0
-            self['pep_score'] = 0
-            self['statement_score'] = 0
-            self['repayment_score'] = 0
-            self['truck_score'] = 0
-            self['company_weight'] = 0
-            self['business_weight'] = 0
-            self['revenue_weight'] = 0
-            self['years_weight'] = 0
-            self['customer_weight'] = 0
-            self['pep_weight'] = 0
-            self['statement_weight'] = 0
-            self['repayment_weight'] = 0
-            self['truck_weight'] = 0
-            self['company_weighted'] = 0
-            self['business_weighted'] = 0
-            self['revenue_weighted'] = 0
-            self['years_weighted'] = 0
-            self['customer_weighted'] = 0
-            self['pep_weighted'] = 0
-            self['statement_weighted'] = 0
-            self['repayment_weighted'] = 0
-            self['truck_weighted'] = 0
-            self['total_weight'] = 0
-            self['total_weighted'] = 0
-            if self.rejection_note:
-                self['state']='reject'
-                self['description'] =  str(self.description) + " " +'● '+  str(self.rejection_note) + ' ' +'('+ str(self.related_stage_name) + ')' + '\n'  
-                self['rejection_note'] = False
-                self['stage_id'] = 1
-                self['state'] ='pending'
-            else:
-                raise UserError('Please Enter The Rejection Note')
-        elif self.stage_id.id == 3:
-            if self.rejection_note:
-                self['state']='reject'
-                self['description'] =  str(self.description) + " " +' ● '+  str(self.rejection_note) + ' ' + '('+ str(self.related_stage_name) + ')' + '\n '
-                self['rejection_note'] = False
-                self['stage_id'] = 2
-                self['state'] ='pending'
-            else:
-                raise UserError('Please Enter The Rejection Note')
-        elif self.stage_id.id == 4:
-            if self.rejection_note:
-                self['state']='reject'
-                self['description'] =   str(self.description) + " " +' ● '+  str(self.rejection_note) + ' ' + '('+ str(self.related_stage_name) + ')' + '\n '
-                self['rejection_note'] = False
-                self['stage_id'] = 1
-                self['state'] ='pending'
-            else:
-                raise UserError('Please Enter The Rejection Note')
-        elif self.stage_id.id == 5:
-            if self.rejection_note:
-                self['state']='reject'
-                self['description'] =   str(self.description) + " " +' ● '+  str(self.rejection_note) + ' ' + '('+ str(self.related_stage_name) + ')' + '\n '
-                self['rejection_note'] = False
-                self['stage_id'] = 1
-                self['state'] ='pending'
-            else:
-                raise UserError('Please Enter The Rejection Note')
+        if self.team_id.id == 1:
+            if self.stage_id.id == 1:
+                if self.rejection_note:
+                    self['state']='reject'
+                    self['description'] =  ' ● '+  str(self.rejection_note) + ' ' +'('+ str(self.related_stage_name) + ')' + '\n' 
+                    self['rejection_note'] = False
+                else:
+                    raise UserError('Please Enter The Rejection Note')
+            elif self.stage_id.id == 2:
+                self['company_structure'] = False
+                self['business_type'] = False
+                self['monthly_revenue'] = False
+                self['no_of_years'] = False
+                self['customer_type'] = False
+                self['pep'] = False
+                self['availability_of_bank_statement'] = False
+                self['repayment_history'] = False
+                self['truck_ownership'] = False
+                self['company_score'] = 0
+                self['business_score'] = 0
+                self['revenue_score'] = 0
+                self['years_score'] = 0
+                self['customer_score'] = 0
+                self['pep_score'] = 0
+                self['statement_score'] = 0
+                self['repayment_score'] = 0
+                self['truck_score'] = 0
+                self['company_weight'] = 0
+                self['business_weight'] = 0
+                self['revenue_weight'] = 0
+                self['years_weight'] = 0
+                self['customer_weight'] = 0
+                self['pep_weight'] = 0
+                self['statement_weight'] = 0
+                self['repayment_weight'] = 0
+                self['truck_weight'] = 0
+                self['company_weighted'] = 0
+                self['business_weighted'] = 0
+                self['revenue_weighted'] = 0
+                self['years_weighted'] = 0
+                self['customer_weighted'] = 0
+                self['pep_weighted'] = 0
+                self['statement_weighted'] = 0
+                self['repayment_weighted'] = 0
+                self['truck_weighted'] = 0
+                self['total_weight'] = 0
+                self['total_weighted'] = 0
+                if self.rejection_note:
+                    self['state']='reject'
+                    self['description'] =  str(self.description) + " " +'● '+  str(self.rejection_note) + ' ' +'('+ str(self.related_stage_name) + ')' + '\n'  
+                    self['rejection_note'] = False
+                    self['stage_id'] = 1
+                    self['state'] ='pending'
+                else:
+                    raise UserError('Please Enter The Rejection Note')
+            elif self.stage_id.id == 3:
+                if self.rejection_note:
+                    self['state']='reject'
+                    self['description'] =  str(self.description) + " " +' ● '+  str(self.rejection_note) + ' ' + '('+ str(self.related_stage_name) + ')' + '\n '
+                    self['rejection_note'] = False
+                    self['stage_id'] = 2
+                    self['state'] ='pending'
+                else:
+                    raise UserError('Please Enter The Rejection Note')
+            elif self.stage_id.id == 4:
+                if self.rejection_note:
+                    self['state']='reject'
+                    self['description'] =   str(self.description) + " " +' ● '+  str(self.rejection_note) + ' ' + '('+ str(self.related_stage_name) + ')' + '\n '
+                    self['rejection_note'] = False
+                    self['stage_id'] = 1
+                    self['state'] ='pending'
+                else:
+                    raise UserError('Please Enter The Rejection Note')
+            elif self.stage_id.id == 5:
+                if self.rejection_note:
+                    self['state']='reject'
+                    self['description'] =   str(self.description) + " " +' ● '+  str(self.rejection_note) + ' ' + '('+ str(self.related_stage_name) + ')' + '\n '
+                    self['rejection_note'] = False
+                    self['stage_id'] = 1
+                    self['state'] ='pending'
+            elif self.stage_id.id == 8:
+                if self.rejection_note:
+                    self['state']='reject'
+                    self['description'] =   str(self.description) + " " +' ● '+  str(self.rejection_note) + ' ' + '('+ str(self.related_stage_name) + ')' + '\n '
+                    self['rejection_note'] = False
+                    self['stage_id'] = 3
+                    self['state'] ='pending'
+                else:
+                    raise UserError('Please Enter The Rejection Note')
         
         
         # raise UserError("Helllo")
+    # "Drive-Through Lending" "Working Capital Lending"
     @api.onchange('product_type','partner_id')
     def partner_id_domain_pur(self):
         if self.product_type == '1': 
@@ -328,7 +578,7 @@ class Leads(models.Model):
         final_date = str(days).split(" ")[0]
         
         for rec in self:
-            if (self.amount <= 0 and self.commission <= 0) or (self.amount <= 0 or self.commission <= 0):    
+            if (self.approved_loan_amount <= 0 and self.approved_interest_rate <= 0) or (self.approved_loan_amount <= 0 or self.approved_interest_rate <= 0):    
                 raise UserError('Amount or Commission  less then equal to 0')
             else:
                 inv = self.env['account.move'].search([('crm_id','=',rec.id)])
@@ -339,13 +589,13 @@ class Leads(models.Model):
                     income_account = self.env['account.account'].search([('code', '=', "3111001")])
                     # receivable_account = self.env['account.account'].search([('code', '=', "1121001")])
                     commission_account = self.env['account.account'].search([('code', '=', "4311002")])
-                    commission_by_day = (self.commission / float(30.5)) * float(final_date)
-                    commission_value = (self.amount / 100) * commission_by_day
+                    commission_by_day = (self.approved_interest_rate / float(30.5)) * float(final_date)
+                    commission_value = (self.approved_loan_amount / 100) * commission_by_day
                     lines.append((0,0,{
                         'product_id':product_id,
                         # 'account_id' : income_account.id,
                         'quantity':1,
-                        'price_unit' : rec.amount
+                        'price_unit' : rec.approved_loan_amount
                     }))
                     lines.append((0,0,{
                         'product_id': 3,
@@ -390,6 +640,22 @@ class Leads(models.Model):
     
       # move.action_post()       
 
+# class Partner(models.Model):
+#     _inherit = 'res.partner'
+
+#     is_bl_approve = fields.Boolean(string="Is Bl Approve")
+#     is_dtl_approve = fields.Boolean(string="Is DTL Approve")
+#     is_id_approve = fields.Boolean(string="Is ID Approve")
+
+class InstrumentNumber(models.Model):
+    _name = 'instrument'
+
+    crm_id = fields.Many2one('crm.lead')
+    instrument_number = fields.Char(string="Instrument Number")
+    instrument_due_date = fields.Date(string="Due Date")
+    instrument_amount = fields.Float(string="Instrument Amount")
+    instrument_document = fields.Binary(string="Document")
+    instrument_document_name = fields.Char(string="Document")
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
@@ -397,6 +663,22 @@ class AccountMove(models.Model):
     crm_id = fields.Many2one('crm.lead' , string="CRM")
     disbursement_id = fields.Many2one('account.disbursement' , string="Disbursement")
     dis_count = fields.Integer(string='Disbursment', compute='get_crm_count')
+
+    def action_register_payment_custom(self):
+        ''' Open the account.payment.register wizard to pay the selected journal entries.
+        :return: An action opening the account.payment.register wizard.
+        '''
+        return {
+            'name': _('Register Payment'),
+            'res_model': 'register.payment',
+            'view_mode': 'form',
+            'context': {
+                'active_model': 'account.move',
+                'active_ids': self.ids,
+            },
+            'target': 'new',
+            'type': 'ir.actions.act_window',
+        }
 
     def get_crm_count(self):
         count = self.env['account.disbursement'].search_count([('invoice_id', '=', self.id)])
@@ -419,10 +701,10 @@ class AccountMove(models.Model):
                 amount = 0
                 account_id = False
                 for line in self.invoice_line_ids:
-                    if line.name == "DTL":
+                    if line.name == "Drive-Through Lending":
                         account_id = line.account_id
                         amount =line.price_subtotal
-                    if line.name == "BL":
+                    if line.name == "Working Capital Lending":
                         account_id = line.account_id
                         amount =line.price_subtotal
                 # sale_order = rec.env['sale.order'].search([('name','=',rec.invoice_origin)])
@@ -452,7 +734,7 @@ class AccountMove(models.Model):
                 # if payment_obj:
                 # crm_model = self.env['crm.lead'].search([('id','=', rec.crm_id.id)])
                 # raise UserError(payment_obj.document_name)
-                    # rec['disbursement_id'] = crm_model.id
+                    # rec['disbursement_id'] = crm_model.idmutl
                     
                 #     for line in payment_obj.move_id.line_ids:
                 #         if line.account_id.id == 32:
@@ -519,7 +801,7 @@ class Disbursementmodels(models.Model):
             if invoice:
                 for inv in invoice:
                     for invline in inv.invoice_line_ids:
-                        if invline.name == "DTL" or invline.name == "BL":
+                        if invline.name == "Drive-Through Lending" or invline.name == "Working Capital Lending":
                             
                             line = (0, 0, {
                                 'account_id': rec1.journal_id.default_account_id.id,
@@ -559,4 +841,47 @@ class ProductModel(models.Model):
     _inherit = 'product.template'
 
     interest_account_id = fields.Many2one('account.account', string="Interest Account Id")
+class KeyPersonnalDetails(models.Model):
+    _name = 'key.personnel.details'
+    _description = 'Key Personnel Details'
 
+    crm_id = fields.Many2one('crm.lead')
+    full_name = fields.Char(string="Full Name",required=True)
+    cnic = fields.Integer(string="Cnic#",required=True)
+    designation =fields.Char(string="Designation",required=True)
+    contact_no = fields.Integer(string = "Contact No",required=True)
+    email_address = fields.Char(string = "Email Address")
+    address = fields.Char(string = "Address")
+class AuthorizedSignatoryDetails(models.Model):
+    _name = 'authorized.signatory.details'
+    _description = 'Authorized Signatory Details'
+
+    crm_id = fields.Many2one('crm.lead')
+    full_name = fields.Char(string="Full Name",required=True)
+    cnic = fields.Integer(string="Cnic#",required=True)
+    designation =fields.Char(string="Designation",required=True)
+    contact_no = fields.Integer(string = "Contact No",required=True)
+    email_address = fields.Char(string = "Email Address")
+    address = fields.Char(string = "Address")
+class DetailsOfDirectorShareHolder(models.Model):
+    _name = 'details.of.director.share.holder'
+    _description = 'Details of Director / Share Holder'
+
+    crm_id = fields.Many2one('crm.lead')
+    full_name = fields.Char(string="Full Name",required=True)
+    cnic = fields.Integer(string="Cnic#",required=True)
+    designation =fields.Char(string="Designation",required=True)
+    contact_no = fields.Integer(string = "Contact No",required=True)
+    email_address = fields.Char(string = "Email Address")
+    address = fields.Char(string = "Address")
+
+class MultiDocCRM(models.Model):
+    _name = "multi.documents.crm"
+
+    # partner_id = fields.Many2one('res.partner')
+    crm_id = fields.Many2one('crm.lead')
+
+    uploader_name = fields.Char(string="Uploader Name")
+    url = fields.Char(string="URL")
+    description = fields.Char(string="Description")
+    date = fields.Date(string="Date")

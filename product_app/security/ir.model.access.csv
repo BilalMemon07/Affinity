@@ -2,3 +2,9 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_disbursement,access.disbursement,model_account_disbursement,,1,1,1,1
 access_rejection_note,access_rejection_note,model_rejection_note,,1,1,1,1
 access_disbursement_payment,access_disbursement_payment,model_disbursement_payment,,1,1,1,1
+access_register_payment,access_register_payment,model_register_payment,,1,1,1,1
+access_multi_documents_crm,access_multi_documents_crm,model_multi_documents_crm,,1,1,1,1
+access_key_personnel_details,access_key_personnel_details,model_key_personnel_details,,1,1,1,1
+access_authorized_signatory_details,access_authorized_signatory_details,model_authorized_signatory_details,,1,1,1,1
+access_details_of_director_share_holder,access_details_of_director_share_holder,model_details_of_director_share_holder,,1,1,1,1
+access_instrument,access_instument,model_instrument,,1,1,1,1

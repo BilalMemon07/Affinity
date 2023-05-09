@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="register_payment_form" model="ir.ui.view">
+        <field name="name">register.payment.form</field>
+        <field name="model">register.payment</field>
+        <field name="arch" type="xml">
+            <form string="Register Payment">
+                <group>
+                    <group>
+                        <field name="journal_id"/>
+                        <field name="payment_method"/>
+                        <field name="memo"/>
+                    </group>
+                    <group>
+                        <field name="amount"/>
+                        <field name="payment_date"/>
+                    </group>
+                </group>
+        
+            </form>
+        </field>
+    </record>
+    <record id="register_payment_wizard" model="ir.actions.act_window">
+        <field name="name">Register Payment</field>
+        <field name="res_model">register.payment</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>
