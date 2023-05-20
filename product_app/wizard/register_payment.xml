@@ -16,7 +16,10 @@
                         <field name="payment_date"/>
                     </group>
                 </group>
-        
+                 <footer>
+                    <button name="get_payment_vals_custom" type="object" string="Create Disbursement Payment" class="oe_highlight"/>
+                    <!-- <button string="Cancel" class="btn btn-default" special="cancel"/> -->
+                </footer>
             </form>
         </field>
     </record>

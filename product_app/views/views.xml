@@ -27,8 +27,8 @@
 
 				<xpath expr="/form/header[1]" position="inside">
 					<button name="approve_action" states="pending,reject" string="Approve" type="object"/>						
-					<button name="%(product_app.rejection_note_wizard)d" states="pending,approve" string="Reject" type="action"/>						
-					<button name="action_create_invoice" states="approve" string="Create Invoice" type="object" attr="{'invisible':[('crm_count','=',1)]}"/>						
+					<button name="%(product_app.rejection_note_wizard)d" states="pending" string="Reject" type="action"/>						
+					<button name="action_create_invoice" states="approve" string="Create Invoice" type="object" attr="{'invisible':['|' , ('crm_count','=',1) ,('related_team_id','!=', 'Customer Pipeline')]}"/>						
 				</xpath>
 				<xpath expr="/form/sheet/group" position="before">
 					<group>
@@ -36,8 +36,8 @@
 							<field name="related_stage_name"/>
 							<field name="related_team_id"/>
 							<field name="product_type"/>
-							<field name="invoice_id"/>
-							<field name="disbursment_id"/>
+							<field name="invoice_id" invisible='1'/>
+							<field name="disbursment_id" invisible='1'/>
 							<!-- <field name="invoice_state"/>
 							<field name="disbursement_state"/> -->
 						</group>
@@ -47,7 +47,7 @@
 					<field name="rejection_note"/>
 				</field>
 				<xpath expr="/form/sheet/notebook" position="inside">
-					<page name="docs" string="Documents">
+					<!-- <page name="docs" string="Documents">
 						<group>
 							<group>
 								<field name="bank_attachment_name" invisible="1"/>
@@ -71,12 +71,155 @@
 								<field name="Note"/>
 							</group>
 						</group>
+					</page> -->
+					<page name="docs" string="Documents">
+						<!-- working Capital -->
+						<group attrs="{'invisible':[('product_type','!=', '1')]}">
+							<!-- any start  -->
+							<group>
+								<field name="name_B_S_l_6_m_name" string="Bank Statement-last 6 months" invisible="1"/>
+								<field name="B_S_l_6_m" filename="name_B_S_l_6_m_name" string="Bank Statement-last 6 months"/>
+								
+								<field name="name_T_D_f_a_l_3_6_m_name" string="Trip Data (for atleast last 3-6 months)" invisible="1"/>
+								<field name="T_D_f_a_l_3_6_m" filename="name_T_D_f_a_l_3_6_m_name" string="Trip Data (for atleast last 3-6 months)"/>
+								
+								<field name="name_A_l_p_u_b_name" string="Any latest paid utility bill" invisible="1"/>
+								<field name="A_l_p_u_b" filename="name_A_l_p_u_b_name" string="Any latest paid utility bill"/>
+								
+								<field name="name_cnic_Front_name" string="CNIC Front" invisible="1"/>
+								<field name="cnic_Front" filename="name_cnic_Front_name" string="CNIC Front"/>
+								
+							</group>
+							<group>
+								<field name="name_F_a_name" invisible="1" string="Financing agreement"/>
+								<field name="F_a" filename="name_F_a_name" string="Financing agreement" attrs="{'invisible':[('related_stage_name','=', 'Business Team')]}"/>
+
+								<field name="name_CNIC_Back_name" string="CNIC Back" invisible="1"/>
+								<field name="CNIC_Back" filename="name_CNIC_Back_name" string="CNIC Back"/>
+								
+								<field name="name_S_t_r_o_N_name" string="Sales tax registration or NTN" invisible="1"/>
+								<field name="S_t_r_o_N" filename="name_S_t_r_o_N_name" string="Sales tax registration or NTN"/>
+								
+								<field name="name_S_P_D_o_b_l_h_f_R__B_a_name" string="Sole Proprietorship Declaration on business letter head for Registered/ Business address" invisible="1"/>
+								<field name="S_P_D_o_b_l_h_f_R__B_a" filename="name_S_P_D_o_b_l_h_f_R__B_a_name" string="Sole Proprietorship Declaration on business letter head for Registered/ Business address"/>
+							</group>
+							<!-- any End-->
+							<!-- partnership start -->
+							<group attrs="{'invisible':[('ownership_struture','!=', 'partnership')]}">
+								<field name="name_A_c_o_P_D_name" string="Attested copy of ‘Partnership Deed’" invisible="1"/>
+								<field name="A_c_o_P_D_" filename="name_A_c_o_P_D_name" string="Attested copy of ‘Partnership Deed’"/>
+							</group>
+							<group attrs="{'invisible':[('ownership_struture','!=', 'partnership')]}">
+								<field name="name_P_o_i_d_a_t_p_a_a_s_name" invisible="1" string="Photocopies of identity documents all the partners and authorized signatories"/>
+								<field name="P_o_i_d_a_t_p_a_a_s" filename="name_P_o_i_d_a_t_p_a_a_s_name" string="Photocopies of identity documents all the partners and authorized signatories"/>
+							</group>
+							<!-- partnership End -->
+							<!-- Company Start -->
+							<group attrs="{'invisible':[('ownership_struture','!=', 'registered_company')]}">
+								<field name="name_C_o_I_name" string="Certificate of Incorporation" invisible="1"/>
+								<field name="C_o_I" filename="name_C_o_I_name" string="Certificate of Incorporation"/>
+								
+								<field name="name_R_o_B_o_D_f_o_o_a_s_t_p_a_t_o_a_o_t_a_name" invisible="1" string="Resolution of Board of Directors for opening of account specifying the person(s) authorized to open and operate the account"/>
+								<field name="R_o_B_o_D_f_o_o_a_s_t_p_a_t_o_a_o_t_a" filename="name_R_o_B_o_D_f_o_o_a_s_t_p_a_t_o_a_o_t_a_name" string="Resolution of Board of Directors for opening of account specifying the person(s) authorized to open and operate the account"/>
+								
+								<field name="name_M_a_A_o_A_name" invisible="1" string="Memorandum and Articles of Association"/>
+								<field name="M_a_A_o_A" filename="name_M_a_A_o_A_name" string="Memorandum and Articles of Association"/>
+								
+								<field name="name_C_c_o_L_F_A_F_B_name" invisible="1" string="Certified copy of Latest ‘Form-A/Form-B’."/>
+								<field name="C_c_o_L_F_A_F_B" filename="name_C_c_o_L_F_A_F_B_name" string="Certified copy of Latest ‘Form-A/Form-B’."/>
+								
+							</group>
+							<group attrs="{'invisible':[('ownership_struture','!=', 'registered_company')]}">
+								<field name="_1_name_P_o_i_d_a_p_S_N_1_a_o_a_t_D_C_name" invisible="1" string="Photocopies of identity documents as per Sr. No. 1 above of all the Directors/CEO"/>
+								<field name="P_o_i_d_a_p_S_N_1_a_o_a_t_D_C" filename="_1_name_P_o_i_d_a_p_S_N_1_a_o_a_t_D_C_name" string="Photocopies of identity documents as per Sr. No. 1 above of all the Directors/CEO"/>
+								
+								<field name="_2_name_P_o_i_d_a_p_S_N_1_a_o_t_b_o_name" invisible="1" string="Photocopies of identity documents as per Sr. No. 1 above of the beneficial owners."/>
+								<field name="P_o_i_d_a_p_S_N_1_a_o_t_b_o" filename="_2_name_P_o_i_d_a_p_S_N_1_a_o_t_b_o_name" string="Photocopies of identity documents as per Sr. No. 1 above of the beneficial owners."/>
+								
+								<field name="name_F_A_F_C_w_i_a_a_F_2_i_a_i_c_name" invisible="1" string="Form A / Form C whichever is applicable; and Form 29 in already incorporated companies"/>
+								<field name="F_A_F_C_w_i_a_a_F_2_i_a_i_c" filename="name_F_A_F_C_w_i_a_a_F_2_i_a_i_c_name" string="Form A / Form C whichever is applicable; and Form 29 in already incorporated companies"/>
+							</group>
+							<!-- Company Start -->
+
+						</group>
+						<group attrs="{'invisible':[('product_type','!=', '3')]}">
+						<group>
+							<field name="name_S_a_w_t_T_p_name" string="Service agreement with the Third party" invisible="1"/>
+							<field name="S_a_w_t_T_p" filename="name_S_a_w_t_T_p_name" string="Service agreement with the Third party"/>
+							
+							<field name="name_S_I_H_name" string="Sales Invoices (Historical)" invisible="1"/>
+							<field name="S_I_H" filename="name_S_I_H_name" string="Sales Invoices (Historical)"/>
+
+							<field name="name_B_s_L_S_M_L_name" string="Bank statements (Last Six Months – Latest)" invisible="1"/>
+							<field name="B_s_L_S_M_L" filename="name_B_s_L_S_M_L_name" string="Bank statements (Last Six Months – Latest)"/>
+						</group>
+						<group>
+							<field name="name_S_T_R_name" string="Sales Tax Returns" invisible="1"/>
+							<field name="S_T_R" filename="name_S_T_R_name" string="Sales Tax Returns"/>
+							
+							<field name="name_F_S_name" string="Financial Statements" invisible="1"/>
+							<field name="F_S" filename="name_F_S_name" string="Financial Statements"/>
 						
+						</group>
+						<group attrs="{'invisible':[('ownership_struture','!=', 'registered_company')]}">
+							<field name="name_C_o_I_name" string="Certificate of Incorporation" invisible="1"/>
+							<field name="C_o_I" filename="name_C_o_I_name" string="Certificate of Incorporation"/>
+						
+							<field name="name_R_o_B_o_D_f_o_o_a_s_t_p_a_t_o_a_o_t_a_name" invisible="1" string="Resolution of Board of Directors for opening of account specifying the person(s) authorized to open and operate the account"/>
+							<field name="R_o_B_o_D_f_o_o_a_s_t_p_a_t_o_a_o_t_a" filename="name_R_o_B_o_D_f_o_o_a_s_t_p_a_t_o_a_o_t_a_name" string="Resolution of Board of Directors for opening of account specifying the person(s) authorized to open and operate the account"/>
+
+							<field name="name_M_a_A_o_A_name" invisible="1" string="Memorandum and Articles of Association"/>
+							<field name="M_a_A_o_A" filename="name_M_a_A_o_A_name" string="Memorandum and Articles of Association"/>
+						
+							<field name="name_C_c_o_L_F_A_F_B_name" invisible="1" string="Certified copy of Latest ‘Form-A/Form-B’."/>
+							<field name="C_c_o_L_F_A_F_B" filename="name_C_c_o_L_F_A_F_B_name" string="Certified copy of Latest ‘Form-A/Form-B’."/>
+							
+							<field name="name_F_A_F_C_w_i_a_a_F_2_i_a_i_c_name" invisible="1" string="Form A / Form C whichever is applicable; and Form 29 in already incorporated companies"/>
+							<field name="F_A_F_C_w_i_a_a_F_2_i_a_i_c" filename="name_F_A_F_C_w_i_a_a_F_2_i_a_i_c_name" string="Form A / Form C whichever is applicable; and Form 29 in already incorporated companies"/>
+						</group>
+						<group attrs="{'invisible':[('ownership_struture','!=', 'registered_company')]}">
+							
+							<field name="name_a_t_D_C_name" invisible="1" string="all the Directors/CEO."/>
+							<field name="a_t_D_C" filename="name_a_t_D_C_name" string="all the Directors/CEO."/>
+							
+							<field name="_3_name_P_o_i_d_a_p_S_N_1_a_o_name" invisible="1" string="Photocopies of identity documents as per Sr. No. 1 above of the beneficial owners."/>
+							<field name="P_o_i_d_a_p_S_N_1_a_o" filename="_3_name_P_o_i_d_a_p_S_N_1_a_o_name" string="Photocopies of identity documents as per Sr. No. 1 above of the beneficial owners."/>
+
+							<field name="name_L_o_A_T_b_f_o_t_t_a_i_o_j_name" invisible="1" string="Letter of Assignment (To be furnished once the trust account is open jointly)"/>
+							<field name="L_o_A_T_b_f_o_t_t_a_i_o_j" attrs="{'invisible':[('related_stage_name','=', 'Business Team')]}" filename="name_L_o_A_T_b_f_o_t_t_a_i_o_j_name" string="Letter of Assignment (To be furnished once the trust account is open jointly)"/>
+							
+							<field name="name_P_L_name" invisible="1" string="Promissory Letter"/>
+							<field name="P_L" filename="name_P_L_name" attrs="{'invisible':[('related_stage_name','=', 'Business Team')]}" string="Promissory Letter"/>
+							
+							<field name="name_I_D_A_name" invisible="1" string=""/>
+							<field name="I_D_A" filename="name_I_D_A_name" attrs="{'invisible':[('related_stage_name','=', 'Business Team')]}" string="Invoice Discounting Agreement"/>
+						</group>
+						</group>
+						<group attrs="{'invisible':[('product_type','!=', '2')]}">
+							<group>
+								<field name="name_cnic_Front_name" string="CNIC Front" invisible="1"/>
+								<field name="cnic_Front" filename="name_cnic_Front_name" string="CNIC Front"/>
+
+								<field name="name_CNIC_Back_name" string="CNIC Back" invisible="1"/>
+								<field name="CNIC_Back" filename="name_CNIC_Back_name" string="CNIC Back"/>
+								
+								<field name="name_A_l_p_u_b_name" string="Any latest paid utility bill" invisible="1"/>
+								<field name="A_l_p_u_b" filename="name_A_l_p_u_b_name" string="Any latest paid utility bill"/>
+							</group>
+							<group>
+								<field name="name_B_S_l_6_m_name" string="Bank Statement-last 6 months" invisible="1"/>
+								<field name="B_S_l_6_m" filename="name_B_S_l_6_m_name" string="Bank Statement-last 6 months"/>
+							
+								<field name="name_T_D_f_a_l_3_6_m_name" string="Trip Data (for atleast last 3-6 months)" invisible="1"/>
+								<field name="T_D_f_a_l_3_6_m" filename="name_T_D_f_a_l_3_6_m_name" string="Trip Data (for atleast last 3-6 months)"/>
+							</group>
+						</group>
 					</page>
+
 				</xpath>
 				<!-- For Risk and compliance Tab -->
 				<xpath expr="/form/sheet/notebook" position="inside" >
-					<page name="risk_tab" string="Risk and Compliance"  attrs="{'invisible':[('related_stage_name','=', 'Business Team')]}">
+					<page name="risk_tab" string="Risk and Compliance"  attrs="{'invisible':['|',('related_stage_name','!=', 'Risk and Compliance'),('related_team_id','!=', 'Customer Pipeline')]}">
 						<group>
 							<group>
 								<field name="kyc_check"/>
@@ -87,8 +230,29 @@
 						</group>
 					</page>
 				</xpath>
+				<!-- Customer Wise Product Info -->
+				<xpath expr="/form/sheet/notebook" position="inside" >
+					<page name="customer_product_info" string="Product Info" attrs="{'invisible':[('related_team_id','!=', 'Customer Pipeline')]}">
+						<group>
+							<group>
+								<field name="borrowers_requested_limit"/>
+								<field name="business_recommended_limit"/>
+								<field name="recommeded_interest_rate_per_month"/>
+								<!-- <field name="applicable_interest_rate" attrs="{'invisible':[('product_type','=', '2')]}"/> -->
+
+							</group>
+							<group>
+							<!-- ///// -->
+								<field name="approved_limit" attrs="{'invisible':[('related_stage_name','=', 'Business Team')]}"/>
+								<field name="approved_interest_rate" attrs="{'invisible':[('related_stage_name','=', 'Business Team')]}"/>
+								<field name="default_under_writing_authority" attrs="{'invisible':['|',('product_type','!=', '3'),('related_stage_name','=', 'Business Team')]}"/>
+								<field name="assosiated_corporate" attrs="{'invisible':['|',('product_type','!=', '3'),('related_stage_name','=', 'Business Team')]}"/>
+							</group>
+						</group>
+					</page>
+				</xpath>
 				<xpath expr="/form/sheet/notebook" position="inside">
-					<page name="instrument" string="Instrument" attrs="{'invisible':[('product_type','=', '3')]}">
+					<page name="instrument" string="Instrument" attrs="{'invisible':['|',('product_type','=', '3'), ('related_team_id','=', 'Customer Pipeline')]}">
 						<field class="mt-5" name="instrument_lines" string="Instrument Lines">
 							<tree editable="bottom">
 								<field  name="instrument_number" width="150"/>
@@ -104,9 +268,9 @@
 										<field name="instrument_due_date" />
 									</group>
 									<group>
-								<field name="instrument_amount" />
-								<field name="instrument_document_name" invisible="1"/>
-								<field name="instrument_document" filename="instrument_document_name" />
+										<field name="instrument_amount" />
+										<field name="instrument_document_name" invisible="1"/>
+										<field name="instrument_document" filename="instrument_document_name" />
 
 									</group>
 								</group>
@@ -124,17 +288,20 @@
 									<field name="cnic_number"/>
 									<field name="father_name"/>
 									<field name="cnic_expiry_date"/>
+									<field name="region"/>
 									<field name="date_of_birth"/>
 									<field name="birth_place"/>
-									<field name="nature_of_business"/>
+									<field name="nature_of_business_id"/>
 									<field name="requestor_income"/>
 									<field name="no_of_years"/>
+									<field name="region"/>
+
 							</group>
 							<group>
 									<field name="mailing_address"/>
 									<field name="permanent_address"/>
-									<field name="city"/>
-									<field name="province"/>
+									<field name="city_id"/>
+									<field name="province_id"/>
 									<field name="ntn_number"/>
 									<field name="ownership_struture"/>
 									<field name="business_development_officer"/>
@@ -195,11 +362,12 @@
 							</form>
 						</field>
 						<h3>Details Of Director/Share Holder</h3>
-						<field class="mt-5" name="details_of_director_share_holder_lines" string="Details Of Director / Share Holder">
+						<field class="mt-5" name="details_of_director_share_holder_lines" string="Details Of Director / Share Holder" attrs="{'invisible':[('ownership_struture','!=', 'registered_company')]}">
 							<tree editable="bottom">
 								<field name="full_name" />
 								<field name="cnic" />
 								<field name="designation" />
+								<field name="share_of_hold" />
 								<field name="contact_no" />
 								<field name="email_address" />
 								<field name="address" />
@@ -210,6 +378,7 @@
 										<field name="full_name" />
 										<field name="cnic" />
 										<field name="designation" />
+										<field name="share_of_hold" />
 									</group>
 									<group>
 										<field name="contact_no" />
@@ -223,7 +392,7 @@
 				</xpath>
 				<!-- ******* End View For General Information -->				
 				<xpath expr="/form/sheet/notebook/page[1]" position="before">
-					<page name="product_info" string="Product Info">
+					<page name="product_info" string="Product Info" attrs="{'invisible':[('related_team_id','=', 'Customer Pipeline')]}">
 						<!-- <group attrs="{'invisible':[('product_type','!=', '1')]}">
 							<group>
 								<field name="commission"/>
@@ -263,14 +432,16 @@
 								<field name="principal_outstanding"/>
 								<field name="interest_outstanding"/>
 								<field name="facility_request_date"/>
+								<field name="Corporate_Customer" attrs="{'invisible':[('product_type','!=', '3')]}"/>
+
 								
 							</group>
 							<group>
 								<field name="instrument_due_date"/>
 								<field name="total_receivable_amount"/>
 								<field name="tenor"/>
-								<field name="invoice_numbr"/>
-								<field name="attach_invoices"/>
+								<field name="invoice_numbr" attrs="{'invisible':[('product_type','!=', '3')]}"/>
+								<field name="attach_invoices" attrs="{'invisible':[('product_type','!=', '3')]}"/>
 								<field name="No_of_blts"/>
 								<field name="underwriting_authority" attrs="{'invisible':[('related_stage_name','=', 'Business Team')]}"/>
 								<field name="Attach_BLTs"/>
@@ -281,7 +452,7 @@
 					</page>
 				</xpath>
 				<xpath expr="/form/sheet/notebook" position="inside">
-				    <page name="risk" string="Risk Calculator ">
+				    <page name="risk" string="Risk Calculator" attrs="{'invisible':[('related_team_id','!=', 'Customer Pipeline')]}">
 				        <group>
 				            <div class="row">
 				                <div class="col-12">
@@ -366,7 +537,7 @@
 									No Of Years	
 									</div>
 				                        <div class="col-3">
-				                            <field name="no_of_years" />
+				                            <field name="_no_of_years_" />
 				                        </div>
 				                        <div class="col-2">
 				                            <field name="years_score" />
@@ -520,7 +691,8 @@
 						<field class="mt-5" name="multi_document_lines" string="Multi Documents Lines">
 							<tree editable="bottom">
 								<field name="uploader_name" />
-								<field name="url" />
+								<field name="url_name" invisible="1"/>
+								<field name="url" filename="url_name" />
 								<field name="description" />
 								<field name="date" />
 							</tree>
@@ -528,7 +700,8 @@
 								<group>
 									<group>
 										<field name="uploader_name" />
-										<field name="url" />
+										<field name="url_name" invisible="1"/>
+										<field name="url" filename="url_name"/>
 									</group>
 									<group>
 										<field name="description" />

@@ -7,6 +7,7 @@ class DisbursementPayment(models.TransientModel):
     _description = 'Disbursement Payment'
     journal = fields.Many2one('account.journal',requird = True,string='Journal',domain = [('type','in',('bank','cash'))] )
     payment_date = fields.Date(string = "Payment Date")
+    default_under_writing_authority  = fields.Selection([('Meezan Bank Limited', 'Meezan Bank Limited'), ('Bank Al Habib', 'Bank Al Habib'),('Trukkr Financial Services', 'Trukkr Financial Services')], string= "Default Under Writing Authority" )
 
     def create_disbursement(self):
         # raise UserError("hea")
@@ -22,7 +23,8 @@ class DisbursementPayment(models.TransientModel):
             # raise UserError(disbursement)
             for dis in disbursement:
                 dis.write({
-                    'journal_id': self.journal.id
+                    'journal_id': self.journal.id,
+                    'default_under_writing_authority':self.default_under_writing_authority
                 })
         # # if self.rejection_note:
         # crm_lead['rejection_note'] = self.rejection_note

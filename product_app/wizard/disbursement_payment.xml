@@ -10,6 +10,9 @@
                         <field name="journal" options="{'no_open': True, 'no_create': True}"/>
                         <field name="payment_date"/>
                     </group>
+                    <group>
+                        <field name="default_under_writing_authority"/>
+                    </group>
                 </group>
                 <footer>
                     <button name="create_disbursement" type="object" string="Create Disbursement Payment" class="oe_highlight"/>

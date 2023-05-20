@@ -7,7 +7,7 @@
     'website': "",
     'category': 'Specific Industry Applications',
     'version': '0.1',
-    'depends': ['crm', 'account','product','base'],
+    'depends': ['crm', 'account','product','base','hr','residence_app'],
     'data': [
         'security/ir.model.access.csv',
         'wizard/rejection_note.xml',

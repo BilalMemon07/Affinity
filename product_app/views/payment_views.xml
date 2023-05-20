@@ -61,6 +61,7 @@
                                 <field name="journal_id" />
                                 <field name="payment_method" />
                                 <field name="bank_vendor_id" />
+                                <field name="default_under_writing_authority" />
                             </group>
                         </group>
                     </sheet>
