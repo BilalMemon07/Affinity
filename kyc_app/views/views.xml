@@ -6,21 +6,29 @@
 			<field name="model">res.partner</field>
 			<field name="inherit_id" ref="base.view_partner_form" />
 			<field name="arch" type="xml">
-				<xpath expr="/form/header" position="inside">
-						<field name="state" widget="statusbar" statusbar_visible="approve,DTL_approve,reject,pending"/>
-						<button name="approve_action" states="pending,reject" string="Approve" type="object"/>						
-					<button name="%(kyc_app.rejection_note_kyc_wizard)d" states="pending,approve" string="Reject" type="action"/>						
+				<xpath expr="/form/sheet" position="before">
+					<header>
+						<field name="state" widget="statusbar" statusbar_visible="Idle,Revision_Required,approve,"/>
+						<button name="approve_action" states="Idle,Revision_Required" string="Approve" type="object"/>						
+						<button name="revision_action" states="approve" string="Revision" type="object"/>						
+					</header>
 				</xpath>
 				<xpath expr="/form/sheet/group/group[1]" position="inside">
 					<field name="vat" invisible="1" />
+					<field name="approve_for_DTL" />
+					<field name="approve_for_BL" />
+					<field name="approve_for_ID" />
+					<field name="status_of_DTL" />
+					<field name="status_of_BL" />
+					<field name="status_of_ID" />
 					<field name="product_type" />
 					<field name="cnic_number" />
 					<field name="gender" />
 					<field name="mailing_address" />
 					<field name="permanent_address" />
-					<field name="city" />
+					<field name="city_id" />
 					<field name="user_limit" />
-					<field name="province" />
+					<field name="province_id" />
 				</xpath>
 				<xpath expr="/form/sheet/group" position="inside">
 					<group>
@@ -35,7 +43,7 @@
 				<xpath expr="/form/sheet/notebook/page[1]" position="inside">
 					<group>
 						<group>
-							<field name="nature_of_business" />
+							<field name="nature_of_business_id" />
 							<field name="requestor_income" />
 							<field name="no_of_years" />
 						</group>
@@ -61,11 +69,60 @@
 					</page>
 				</xpath>
 				<xpath expr="/form/sheet/notebook" position="inside">
+					<page name="invoice_discounting" string="Invoice Discounting">
+						<group>
+							<group>
+								<field name="borrowers_requested_limit"/>
+								<field name="business_recommended_limit"/>
+								<field name="recommeded_interest_rate_per_month"/>
+							</group>
+							<group>
+								<field name="approved_limit"/>
+								<field name="approved_interest_rate"/>
+								<field name="default_under_writing_authority"/>
+								<field name="assosiated_corporate"/>
+							</group>
+						</group>
+					</page>
+				</xpath>
+				<xpath expr="/form/sheet/notebook" position="inside">
+					<page name="working_capital" string="Working Capital">
+						<group>
+							<group>
+								<field name="borrowers_requested_limit_wl"/>
+								<field name="business_recommended_limit_wl"/>
+								<field name="recommeded_interest_rate_per_month_wl"/>
+							</group>
+							<group>
+								<field name="approved_limit_wl"/>
+								<field name="approved_interest_rate_wl"/>
+							</group>
+						</group>
+					</page>
+				</xpath>
+				<xpath expr="/form/sheet/notebook" position="inside">
+					<page name="drive_throught_landing" string="Drive Throught Landing">
+						<group>
+							<group>
+								<field name="borrowers_requested_limit_dtl"/>
+								<field name="business_recommended_limit_dtl"/>
+								<field name="recommeded_interest_rate_per_month_dtl"/>
+							</group>
+							<group>
+								<field name="approved_limit_dtl"/>
+								<field name="approved_interest_rate_dtl"/>
+								<field name="applicable_interest_rate"/>
+							</group>
+						</group>
+					</page>
+				</xpath>
+				<xpath expr="/form/sheet/notebook" position="inside">
 					<page name="multiple_doc" string="Multiple Document">
 						<field class="mt-5" name="multi_document_lines" string="Multi Documents Lines">
 							<tree editable="bottom">
 								<field name="uploader_name" />
-								<field name="url" />
+								<field name="url_name"  invisible="1"/>
+								<field name="url" filename="url_name"/>
 								<field name="description" />
 								<field name="date" />
 							</tree>
@@ -73,7 +130,8 @@
 								<group>
 									<group>
 										<field name="uploader_name" />
-										<field name="url" />
+										<field name="url_name" invisible="1" />
+										<field name="url" filename="url_name"/>
 									</group>
 									<group>
 										<field name="description" />

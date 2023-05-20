@@ -12,11 +12,11 @@
     'website': "",
     'category': 'Specific Industry Applications',
     'version': '0.1',
-    'depends': ['base'],
+    'depends': ['base','crm','residence_app'],
     'data': [
         'security/ir.model.access.csv',
-        'views/views.xml',
         'wizards/rejection_note_kyc.xml',
+        'views/views.xml',
     ],
     'license': 'AGPL-3',
     'license': 'AGPL-3',
