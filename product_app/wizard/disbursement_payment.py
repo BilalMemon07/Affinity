@@ -8,7 +8,7 @@ class DisbursementPayment(models.TransientModel):
     journal = fields.Many2one('account.journal',requird = True,string='Journal',domain = [('type','in',('bank','cash'))] )
     payment_date = fields.Date(string = "Payment Date")
     default_under_writing_authority  = fields.Selection([('Meezan Bank Limited', 'Meezan Bank Limited'), ('Bank Al Habib', 'Bank Al Habib'),('Trukkr Financial Services', 'Trukkr Financial Services')], string= "Default Under Writing Authority" )
-
+    transaction_id = fields.Char(string="Transaction id")
     def create_disbursement(self):
         # raise UserError("hea")
         if self.journal:

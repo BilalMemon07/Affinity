@@ -8,3 +8,4 @@ access_key_personnel_details,access_key_personnel_details,model_key_personnel_de
 access_authorized_signatory_details,access_authorized_signatory_details,model_authorized_signatory_details,,1,1,1,1
 access_details_of_director_share_holder,access_details_of_director_share_holder,model_details_of_director_share_holder,,1,1,1,1
 access_instrument,access_instument,model_instrument,,1,1,1,1
+access_rejection_note_crm,access_rejection_note_crm,model_rejection_note_crm,,1,1,1,1

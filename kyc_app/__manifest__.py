@@ -12,7 +12,7 @@
     'website': "",
     'category': 'Specific Industry Applications',
     'version': '0.1',
-    'depends': ['base','crm','residence_app'],
+    'depends': ['base','crm','residence_app', 'product_app'],
     'data': [
         'security/ir.model.access.csv',
         'wizards/rejection_note_kyc.xml',

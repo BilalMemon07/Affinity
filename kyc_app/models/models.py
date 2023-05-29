@@ -66,7 +66,11 @@ class Partner(models.Model):
     status_of_DTL = fields.Selection([('Idle', 'Idle'),('Revision_Required', 'Revision Required'), ('approve', 'Approved')], string = "Status of DTL")
     status_of_BL = fields.Selection([('Idle', 'Idle'),('Revision_Required', 'Revision Required'), ('approve', 'Approved')], string = "Status of BL")
     status_of_ID = fields.Selection([('Idle', 'Idle'),('Revision_Required', 'Revision Required'), ('approve', 'Approved')], string = "Status of ID")
+    
+    key_personnel_details_lines = fields.One2many('key.personnel.details', 'customer_id', string='Key Personnel Details Lines')
+    authorized_signatory_details_lines = fields.One2many('authorized.signatory.details', 'customer_id', string='Authorized Signatory Details Lines')
 
+# confirm approve stages fields
 
 
     @api.model
@@ -99,3 +103,5 @@ class MultiDoc(models.Model):
     url_name = fields.Char(string="Document")
     description = fields.Char(string="Description")
     date = fields.Date(string="Date")
+
+

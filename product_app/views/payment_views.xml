@@ -52,6 +52,7 @@
                             <group>
                                 <field name='internal_transfer' />
                                 <field name='payment_type' />
+                                <field name='transaction_id' />
                                 <field name="vendor_id" />
                                 <field name="amount" />
                                 <field name="date" />

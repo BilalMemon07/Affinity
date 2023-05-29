@@ -17,7 +17,7 @@
 					<field name="crm_count" string="Invoice" widget="statinfo"/>
 					</button>
                     </div> -->
-					<button name="open_patient_appointment" type="object" class="oe_stat_button" icon="fa-book" attrs="{'invisible': [('type', '=', 'lead')]}">
+					<button name="open_patient_appointment" type="object" class="oe_stat_button" icon="fa-book" attrs="{'invisible': ['|',('related_team_id','=', 'Customer Pipeline'),('type', '=', 'lead')]}">
 						<div class="o_stat_info">
 							<field name="crm_count" class="o_stat_value" string="Invoice"/>
 							<span class="o_stat_text">Invoice</span>
@@ -28,7 +28,7 @@
 				<xpath expr="/form/header[1]" position="inside">
 					<button name="approve_action" states="pending,reject" string="Approve" type="object"/>						
 					<button name="%(product_app.rejection_note_wizard)d" states="pending" string="Reject" type="action"/>						
-					<button name="action_create_invoice" states="approve" string="Create Invoice" type="object" attr="{'invisible':['|' , ('crm_count','=',1) ,('related_team_id','!=', 'Customer Pipeline')]}"/>						
+					<button name="action_create_invoice"  string="Create Invoice" type="object" attrs="{'invisible':['|', ('related_team_id','=', 'Customer Pipeline'),('crm_count','=',1)]}"/>						
 				</xpath>
 				<xpath expr="/form/sheet/group" position="before">
 					<group>
@@ -283,6 +283,7 @@
 					<page name="general_infomation" string="General Information" attrs="{'invisible':[('related_team_id','!=', 'Customer Pipeline')]}">
 						<group>
 							<group>
+									<field name="company_name"/>
 									<field name="customer_name"/>
 									<field name="gender"/>
 									<field name="cnic_number"/>
@@ -306,7 +307,6 @@
 									<field name="ownership_struture"/>
 									<field name="business_development_officer"/>
 									<field name="supervising_manager"/>
-									<field name="company_name"/>
 									<field name="company_address"/>
 									<field name="other_sources_of_income"/>
 							</group>
@@ -712,6 +712,44 @@
 						</field>
 					</page>
 				</xpath>
+				<xpath expr="/form/sheet/notebook" position="inside">
+					<page name="Bank_info" string="Bank Details" attrs="{'invisible':[('related_team_id','!=', 'Customer Pipeline')]}">
+						<field class="mt-5" name="partner_bank_id" string="Bank Details">
+							<tree editable="bottom">
+								<field name="bank_id" />
+								<field name="acc_number" />
+							</tree>
+							<form>
+								<group>
+									<group>
+										<field name="bank_id" />
+										<field name="acc_number" />
+									</group>
+								</group>
+							</form>
+						</field>
+					</page>
+				</xpath>
+				<xpath expr="/form/sheet/notebook" position="inside">
+					<page name="rejection_note_id" string="Rejection Reason">
+						<field class="mt-5" name="rejection_note_id" string="Rejection Reason">
+							<tree editable="bottom">
+								<field name="time_stamp" />
+								<field name="rejection_note" />
+								<field name="rejected_by" />
+							</tree>
+							<form>
+								<group>
+									<group>
+										<field name="time_stamp" />
+										<field name="rejection_note" />
+										<field name="rejected_by" />
+									</group>
+								</group>
+							</form>
+						</field>
+					</page>
+				</xpath>
 				<!-- ?? -->
 			</field>
 		</record>
@@ -721,7 +759,20 @@
 			<field name="inherit_id" ref="crm.quick_create_opportunity_form" />
 			<field name="arch" type="xml">
 				<field name="partner_id" position="before">
+					<field name="id"/>
 					<field name="product_type"/>
+					<field name="instrument_due_date"/>
+					<field name="approved_loan_amount"/>
+				</field>
+			</field>
+		</record>
+		<record id="view_account_payment_form_inherit" model="ir.ui.view">
+			<field name="name">view_account_payment_form_inherit</field>
+			<field name="model">account.payment</field>
+			<field name="inherit_id" ref="account.view_account_payment_form" />
+			<field name="arch" type="xml">
+				<field name="partner_id" position="before">
+					<field name="transaction_id"/>
 				</field>
 			</field>
 		</record>
@@ -733,7 +784,10 @@
 			<field name="arch" type="xml">
 				<xpath expr="/kanban/templates/t/div/div[3]/div[4]" position="after">
 					<div>
-                        <field name="product_type"/>
+						<field name="id"/>
+						<field name="product_type"/>
+						<field name="instrument_due_date"/>
+						<field name="approved_loan_amount"/>
 					</div>
 				</xpath>
 			</field>
@@ -744,10 +798,13 @@
 			<field name="inherit_id" ref="account.view_move_form" />
 			<field name="arch" type="xml">
 				<xpath expr="/form/header" position="inside">
-					<button name="%(product_app.disbursement_payment_wizard)d" string="Disbursement Payment" class="oe_highlight" type="action"  attrs="{'invisible': ['|',('move_type', '!=', 'out_invoice'),('dis_count','=',1)]}"/>
-					<button name="action_register_payment_custom" string="Register Payment" class="oe_highlight" type="object" />
+					<button name="%(product_app.disbursement_payment_wizard)d" string="Disbursement Payment" class="oe_highlight" type="action"  attrs="{'invisible':['|', '|', '|', ('state', '!=', 'posted'),('dis_count','=',1),('is_move_sent', '=', True), ('move_type', 'not in', ('out_invoice', 'out_refund'))]}"/>
+					<button name="action_register_payment_custom" string="Register Payment" class="oe_highlight" type="object" attrs="{'invisible': ['|', '|', '|', ('state', '!=', 'posted'), ('dis_count','!=',1), ('payment_state', 'not in', ('not_paid', 'partial')), ('move_type', 'not in', ('out_invoice', 'out_refund'))]}"/>
 
 				</xpath>
+				<field name="invoice_date_due" position="after">
+					<field name="tenor"/>
+				</field>
 				<xpath expr="/form/sheet/div/button[1]" position="before">
 					<!-- <div class="o_stat_info" name="button_box">
 					<button name="open_patient_appointment" type="object" class="oe_stat_button" icon="fa-book">

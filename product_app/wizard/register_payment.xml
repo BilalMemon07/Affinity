@@ -9,7 +9,7 @@
                     <group>
                         <field name="journal_id"/>
                         <field name="payment_method"/>
-                        <field name="memo"/>
+                        <field name="transaction_id"/>
                     </group>
                     <group>
                         <field name="amount"/>

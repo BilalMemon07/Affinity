@@ -52,6 +52,56 @@
 							<field name="company_name" />
 							<field name="company_address" />
 						</group>
+						<h3>Key Personnel Details</h3>
+						<field class="mt-5" name="key_personnel_details_lines" string="Key Personnel Details ">
+							<tree editable="bottom">
+								<field name="full_name" />
+								<field name="cnic" />
+								<field name="designation" />
+								<field name="contact_no" />
+								<field name="email_address" />
+								<field name="address" />
+							</tree>
+							<form>
+								<group>
+									<group>
+										<field name="full_name" />
+										<field name="cnic" />
+										<field name="designation" />
+									</group>
+									<group>
+										<field name="contact_no" />
+										<field name="email_address" />
+										<field name="address" />
+									</group>
+								</group>
+							</form>
+						</field>
+						<h3>Authorized Signatory Details</h3>
+						<field class="mt-5" name="authorized_signatory_details_lines" string="Authorized Signatory Details Lines">
+							<tree editable="bottom">
+								<field name="full_name" />
+								<field name="cnic" />
+								<field name="designation" />
+								<field name="contact_no" />
+								<field name="email_address" />
+								<field name="address" />
+							</tree>
+							<form>
+								<group>
+									<group>
+										<field name="full_name" />
+										<field name="cnic" />
+										<field name="designation" />
+									</group>
+									<group>
+										<field name="contact_no" />
+										<field name="email_address" />
+										<field name="address" />
+									</group>
+								</group>
+							</form>
+						</field>
 					</group>
 				</xpath>
 				<xpath expr="/form/sheet/notebook" position="inside">
