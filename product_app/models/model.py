@@ -376,6 +376,7 @@ class Leads(models.Model):
                     list3.append((0,0, {
                     'bank_id': line_3.bank_id,
                     'acc_number': line_3.acc_number,
+                    'partner_id': self.partner_id.id
                     })), 
             self['customer_name'] = self.partner_id.name
             self['gender'] = self.partner_id.gender
@@ -412,7 +413,7 @@ class Leads(models.Model):
         if self.instrument_due_date and self.facility_request_date:
             tenor = self['instrument_due_date'] - self['facility_request_date']
             final_date = str(tenor).split(" ")[0]
-            self['tenor'] = float(final_date) 
+            self['tenor'] = float(final_date)  + 1
 
     @api.onchange("approved_loan_amount","applicable_interest_rate","tenor")
     def calculate_total_receivable(self):
@@ -562,6 +563,7 @@ class Leads(models.Model):
                                 list3.append((0,0, {
                                     'bank_id': line_3.bank_id,
                                     'acc_number': line_3.acc_number,
+                                    'partner_id':self.partner_id.id
                                 })), 
                         obj = {
                         'name': self.customer_name,
@@ -954,7 +956,7 @@ class Leads(models.Model):
                     income_account = self.env['account.account'].search([('code', '=', "3111001")])
                     # receivable_account = self.env['account.account'].search([('code', '=', "1121001")])
                     commission_account = self.env['account.account'].search([('code', '=', "4311002")])
-                    commission_by_day = (self.applicable_interest_rate / float(30)) * float(final_date)
+                    commission_by_day = (self.applicable_interest_rate / float(30)) * (float(final_date) + 1)
                     commission_value = (self.approved_loan_amount / 100) * commission_by_day
                     lines.append((0,0,{
                         'product_id':product_id,
@@ -1030,13 +1032,15 @@ class AccountMove(models.Model):
     disbursement_id = fields.Many2one('account.disbursement' , string="Disbursement")
     dis_count = fields.Integer(string='Disbursment', compute='get_crm_count')
     tenor = fields.Integer(string='Tenor')
+    intrest_calculator_id  = fields.One2many('intrest.calculator','invoice_id', string = "Intrest Calculator")
+
 
     @api.onchange('invoice_date', 'invoice_date_due')
     def _calculate_tenor_on_invoice(self):
         if self.invoice_date_due and self.invoice_date:
             tenor = self['invoice_date_due'] - self['invoice_date']
             final_date = str(tenor).split(" ")[0]
-            self['tenor'] = float(final_date) 
+            self['tenor'] = float(final_date) + 1 
     
 
     def action_register_payment_custom(self):
@@ -1097,7 +1101,6 @@ class AccountMove(models.Model):
                     'memo':rec.name,
                     'journal_id' : False,
                     'payment_method':"Manual",
-                    "transaction_id":"transaction_id",
                     'date':datetime.now() ,
                     # 'payment_method_line_id': 2,#journal.outbound_payment_method_line_ids[0].id,
                     'amount': amount,
@@ -1239,6 +1242,18 @@ class KeyPersonnalDetails(models.Model):
     contact_no = fields.Char(string = "Contact No",required=True)
     email_address = fields.Char(string = "Email Address")
     address = fields.Char(string = "Address")
+
+class IntrestCalculator(models.Model):
+    _name = 'intrest.calculator'
+    _description = 'Intrest Calculator'
+
+    invoice_id = fields.Many2one('account.move')
+    intrest_of_month = fields.Char(string="Intrest of Month")
+    intrest_of_year = fields.Char(string="Intrest of Year")
+    date = fields.Date(string="date")
+    no_of_days = fields.Char(string="Number Of Days")
+    intrest_of_this_month = fields.Float(string="Intrest Of Month")
+
 class AuthorizedSignatoryDetails(models.Model):
     _name = 'authorized.signatory.details'
     _description = 'Authorized Signatory Details'

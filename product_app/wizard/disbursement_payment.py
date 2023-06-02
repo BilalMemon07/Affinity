@@ -24,6 +24,7 @@ class DisbursementPayment(models.TransientModel):
             for dis in disbursement:
                 dis.write({
                     'journal_id': self.journal.id,
+                    "transaction_id":self.transaction_id,
                     'default_under_writing_authority':self.default_under_writing_authority
                 })
         # # if self.rejection_note:

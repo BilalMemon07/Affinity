@@ -1,3 +1,4 @@
+from doctest import ELLIPSIS_MARKER
 from odoo import fields, models
 from odoo.exceptions import UserError
 
@@ -64,7 +65,9 @@ class RegisterPayment(models.TransientModel):
             payment_id_2.action_post()
             receivable_line_2 = payment_id_2.line_ids.filtered('credit')
             invoice.js_assign_outstanding_line(receivable_line_2.id)
-            invoice['x_studio_remaining_intrest'] =  payment_amount - invoice['x_studio_remaining_intrest']
+            invoice['x_studio_remaining_intrest'] =  invoice['x_studio_remaining_intrest'] - payment_amount
+            if invoice['x_studio_remaining_intrest'] < 0 :
+                invoice['x_studio_remaining_intrest'] = 0
         elif self.amount <= intrest_amount and invoice.x_studio_remaining_intrest > 0:
             payment_id_3 = self.env['account.payment'].create({
                 'date': self.payment_date,
@@ -84,7 +87,10 @@ class RegisterPayment(models.TransientModel):
             payment_id_3.action_post()
             receivable_line_3 = payment_id_3.line_ids.filtered('credit')
             invoice.js_assign_outstanding_line(receivable_line_3.id)
-        elif self.amount <= invoice.amount_residual and invoice.x_studio_remaining_intrest <= 0:
+            if invoice['x_studio_remaining_intrest'] < 0 :
+                invoice['x_studio_remaining_intrest'] = 0
+        elif self.amount < invoice.amount_residual and invoice.x_studio_remaining_intrest <= 0:
+            # raise UserError("Gelo")
             payment_id_4 = self.env['account.payment'].create({
                 'date': self.payment_date,
                 'amount': self.amount,
@@ -102,7 +108,27 @@ class RegisterPayment(models.TransientModel):
             payment_id_4.action_post()
             receivable_line_4 = payment_id_4.line_ids.filtered('credit')
             invoice.js_assign_outstanding_line(receivable_line_4.id)
-        elif self.amount >  invoice.amount_residual:
+        elif self.amount == invoice.amount_residual and invoice.x_studio_remaining_intrest <= 0:
+            # raise UserError("Gelo")
+            payment_id_4 = self.env['account.payment'].create({
+                'date': self.payment_date,
+                'amount': self.amount,
+                'payment_type': 'inbound',
+                'partner_type': "customer",
+                'ref': invoice.name,
+                'journal_id': self.journal_id.id,
+                'currency_id': invoice.currency_id.id,
+                'partner_id': invoice.partner_id.id,
+                'partner_bank_id': self.journal_id.bank_account_id.id,
+                'payment_method_line_id': payment_method_line.id,
+                'destination_account_id': 17,
+                'transaction_id':self.transaction_id
+            })
+            payment_id_4.action_post()
+            receivable_line_4 = payment_id_4.line_ids.filtered('credit')
+            invoice.js_assign_outstanding_line(receivable_line_4.id)
+        # elif self.amount > invoice.amount_residual:
+        else:
             raise UserError('Amount is not greater then invoice due amount')
         
         # raise UserError(str(vals))
@@ -110,4 +136,132 @@ class RegisterPayment(models.TransientModel):
 
 
 
-            
+    def get_payment_vals_custom_2(self):
+        invoice = self.env['account.move'].browse(
+                self._context.get('active_ids', [])
+        )
+        
+        payment_method_line = self.journal_id._get_available_payment_method_lines("inbound")[:1]
+        if self.amount > invoice.amount_residual:
+            raise UserError('Amount is not greater then invoice due amount')
+        elif self.amount > invoice.x_studio_remaining_intrest and self.amount < invoice.amount_residual:
+            payment_amount =  self.amount -  invoice.x_studio_remaining_intrest
+            # raise UserError(payment_amount)
+            payment_id_1 = self.env['account.payment'].create({
+                'date': self.payment_date,
+                'amount': payment_amount,
+                'payment_type': 'inbound',
+                'partner_type': "customer",
+                'ref': invoice.name,
+                'journal_id': self.journal_id.id,
+                'currency_id': invoice.currency_id.id,
+                'partner_id': invoice.partner_id.id,
+                'partner_bank_id': self.journal_id.bank_account_id.id,
+                'payment_method_line_id': payment_method_line.id,
+                'destination_account_id': 17,
+                'transaction_id':self.transaction_id
+            })
+            payment_id_1.action_post()
+            receivable_line_1 = payment_id_1.line_ids.filtered('credit')
+            invoice.js_assign_outstanding_line(receivable_line_1.id)
+            payment_id_2 = self.env['account.payment'].create({
+                'date': self.payment_date,
+                'amount': invoice.x_studio_remaining_intrest,
+                'payment_type': 'inbound',
+                'partner_type': "customer",
+                'ref': invoice.name,
+                'journal_id': self.journal_id.id,
+                'currency_id': invoice.currency_id.id,
+                'partner_id': invoice.partner_id.id,
+                'partner_bank_id': self.journal_id.bank_account_id.id,
+                'payment_method_line_id': payment_method_line.id,
+                'destination_account_id': 95,
+                'transaction_id':self.transaction_id
+            })
+            payment_id_2.action_post()
+            receivable_line_2 = payment_id_2.line_ids.filtered('credit')
+            invoice.js_assign_outstanding_line(receivable_line_2.id)
+            c = invoice['x_studio_remaining_intrest'] - self.amount            
+            if c < 0 :
+                invoice['x_studio_remaining_intrest'] = 0
+        
+        elif self.amount == invoice.x_studio_remaining_intrest:
+            payment_amount =  self.amount -  invoice.x_studio_remaining_intrest
+            payment_id_4 = self.env['account.payment'].create({
+                'date': self.payment_date,
+                'amount': invoice.x_studio_remaining_intrest,
+                'payment_type': 'inbound',
+                'partner_type': "customer",
+                'ref': invoice.name,
+                'journal_id': self.journal_id.id,
+                'currency_id': invoice.currency_id.id,
+                'partner_id': invoice.partner_id.id,
+                'partner_bank_id': self.journal_id.bank_account_id.id,
+                'payment_method_line_id': payment_method_line.id,
+                'destination_account_id': 95,
+                'transaction_id':self.transaction_id
+            })
+            payment_id_4.action_post()
+            receivable_line_4 = payment_id_4.line_ids.filtered('credit')
+            invoice.js_assign_outstanding_line(receivable_line_4.id)
+            invoice['x_studio_remaining_intrest'] =  payment_amount - invoice['x_studio_remaining_intrest']            
+
+        elif self.amount < invoice.x_studio_remaining_intrest and invoice.x_studio_remaining_intrest > 0 : 
+            payment_id_3 = self.env['account.payment'].create({
+                'date': self.payment_date,
+                'amount': self.amount,
+                'payment_type': 'inbound',
+                'partner_type': "customer",
+                'ref': invoice.name,
+                'journal_id': self.journal_id.id,
+                'currency_id': invoice.currency_id.id,
+                'partner_id': invoice.partner_id.id,
+                'partner_bank_id': self.journal_id.bank_account_id.id,
+                'payment_method_line_id': payment_method_line.id,
+                'destination_account_id': 95,
+                'transaction_id':self.transaction_id
+            })
+
+            invoice['x_studio_remaining_intrest'] = invoice['x_studio_remaining_intrest'] - self.amount
+            if c < 0 :
+                invoice['x_studio_remaining_intrest'] = 0
+            payment_id_3.action_post()
+            receivable_line_3 = payment_id_3.line_ids.filtered('credit')
+            invoice.js_assign_outstanding_line(receivable_line_3.id)
+        
+        elif self.amount < invoice.amount_residual and invoice.x_studio_remaining_intrest < 0:
+            payment_id_5 = self.env['account.payment'].create({
+                'date': self.payment_date,
+                'amount': self.amount,
+                'payment_type': 'inbound',
+                'partner_type': "customer",
+                'ref': invoice.name,
+                'journal_id': self.journal_id.id,
+                'currency_id': invoice.currency_id.id,
+                'partner_id': invoice.partner_id.id,
+                'partner_bank_id': self.journal_id.bank_account_id.id,
+                'payment_method_line_id': payment_method_line.id,
+                'destination_account_id': 17,
+                'transaction_id':self.transaction_id
+            })
+            payment_id_5.action_post()
+            receivable_line_5 = payment_id_5.line_ids.filtered('credit')
+            invoice.js_assign_outstanding_line(receivable_line_5.id)
+        elif self.amount == invoice.amount_residual and invoice.x_studio_remaining_intrest < 0:
+            payment_id_6 = self.env['account.payment'].create({
+                'date': self.payment_date,
+                'amount': self.amount,
+                'payment_type': 'inbound',
+                'partner_type': "customer",
+                'ref': invoice.name,
+                'journal_id': self.journal_id.id,
+                'currency_id': invoice.currency_id.id,
+                'partner_id': invoice.partner_id.id,
+                'partner_bank_id': self.journal_id.bank_account_id.id,
+                'payment_method_line_id': payment_method_line.id,
+                'destination_account_id': 17,
+                'transaction_id':self.transaction_id
+            })
+            payment_id_6.action_post()
+            receivable_line_6 = payment_id_6.line_ids.filtered('credit')
+            invoice.js_assign_outstanding_line(receivable_line_6.id)

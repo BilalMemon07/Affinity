@@ -733,7 +733,7 @@
 				<xpath expr="/form/sheet/notebook" position="inside">
 					<page name="rejection_note_id" string="Rejection Reason">
 						<field class="mt-5" name="rejection_note_id" string="Rejection Reason">
-							<tree editable="bottom">
+							<tree editable="bottom" create="false" delete="false">
 								<field name="time_stamp" />
 								<field name="rejection_note" />
 								<field name="rejected_by" />
@@ -760,9 +760,9 @@
 			<field name="arch" type="xml">
 				<field name="partner_id" position="before">
 					<field name="id"/>
-					<field name="product_type"/>
+					<!-- <field name="product_type"/>
 					<field name="instrument_due_date"/>
-					<field name="approved_loan_amount"/>
+					<field name="approved_loan_amount"/> -->
 				</field>
 			</field>
 		</record>
@@ -800,6 +800,7 @@
 				<xpath expr="/form/header" position="inside">
 					<button name="%(product_app.disbursement_payment_wizard)d" string="Disbursement Payment" class="oe_highlight" type="action"  attrs="{'invisible':['|', '|', '|', ('state', '!=', 'posted'),('dis_count','=',1),('is_move_sent', '=', True), ('move_type', 'not in', ('out_invoice', 'out_refund'))]}"/>
 					<button name="action_register_payment_custom" string="Register Payment" class="oe_highlight" type="object" attrs="{'invisible': ['|', '|', '|', ('state', '!=', 'posted'), ('dis_count','!=',1), ('payment_state', 'not in', ('not_paid', 'partial')), ('move_type', 'not in', ('out_invoice', 'out_refund'))]}"/>
+					<button name="apply_intrest_calculation" string="Apply Intrest Calculator" class="oe_highlight" type="object" attrs="{'invisible': [('state', '!=', 'posted')]}"/>
 
 				</xpath>
 				<field name="invoice_date_due" position="after">
@@ -818,6 +819,31 @@
 						</div>
 					</button>
 				</xpath>
+				<xpath expr="/form/sheet/notebook" position="inside">
+					<page name="Intrest_calculator" string="Intrest Calculator">
+						<field class="mt-5" name="intrest_calculator_id" string="Intrest Calculator">
+							<tree editable="bottom" create="false" delete="false">
+								<field name="date" />
+								<field name="intrest_of_month" />
+								<field name="intrest_of_year" />
+								<field name="no_of_days" />
+								<field name="intrest_of_this_month" />
+							</tree>
+							<form>
+								<group>
+									<group>
+										<field name="date" />
+										<field name="intrest_of_month" />
+										<field name="intrest_of_year" />
+										<field name="no_of_days" />
+										<field name="intrest_of_this_month" />
+									</group>
+								</group>
+							</form>
+						</field>
+					</page>
+				</xpath>
+
 			</field>
 		</record>
 
