@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_res_city,res.city,model_res_city,,1,1,1,1
+access_res_province,res.province,model_res_province,,1,1,1,1
+access_res_nature,res.nature,model_res_nature,,1,1,1,1
+access_res_region,res.region,model_res_region,,1,1,1,1

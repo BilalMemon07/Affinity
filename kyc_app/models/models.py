@@ -6,8 +6,8 @@ from odoo.exceptions import UserError
 class Partner(models.Model):
     _inherit = 'res.partner'
 
-    rejection_note = fields.Text(String ="Rejection Note")
-    state = fields.Selection([('Idle', 'Idle'),('Revision_Required', 'Revision Required'), ('approve', 'Approved')], default="Idle",string='Status')
+    rejection_note = fields.Text(string ="Rejection Note")
+    state = fields.Selection([('Idle', 'Idle'),('Revision_Required', 'Revision Required'), ('approve', 'Approved')],string='Status')
     # customer_code = fields.Char(string='Customer Code')
     product_type = fields.Selection([('1', 'Working Capital Lending'), ('2', 'Drive-Through Lending'),('3', 'Invoice Discounting'),('4', 'Tire Financing'),('5', 'Vehicle Leasing')], string='Product Type')
     gender = fields.Selection([('male', 'Male'), ('female', 'Female')], string='Gender')
@@ -26,10 +26,12 @@ class Partner(models.Model):
     company_name = fields.Char(string= "Company Name" )
     company_address = fields.Char(string= "Company Address" )
     cnic_front = fields.Binary(string="CNIC Front" )
+    cnic_front_name = fields.Binary(string="CNIC Front" )
     cnic_back = fields.Binary(string="CNIC Back" )
+    cnic_back_name = fields.Binary(string="CNIC Back" )
     security_cheque = fields.Binary(string="Security Cheque")
     customer_image = fields.Binary(string="Customer Image")
-    region = fields.Selection([('Karachi', 'Karachi'), ('Lahore', 'Lahore'),('Multan', 'Multan'),('Islamabad', 'Islamabad'),('Peshawar', 'Peshawar')], string='Region')    
+    region = fields.Many2one('res.region', string='Region')    
     user_limit = fields.Float(string="User Limit")
     crm_id = fields.Many2one("crm.lead", string="CRM")
     multi_document_lines = fields.One2many('multi.documents', 'partner_id', string='Multi Documents Lines')
@@ -76,7 +78,7 @@ class Partner(models.Model):
     @api.model
     def create(self,vals):
         # if vals.get('name', _('New')) == _('New'):
-        vals['state'] = 'Idle'
+        # vals['state'] = 'Idle'
         vals['status_of_DTL'] = 'Idle'
         vals['status_of_BL'] = 'Idle'
         vals['status_of_ID'] = 'Idle'
@@ -96,7 +98,6 @@ class MultiDoc(models.Model):
     _name = "multi.documents"
 
     partner_id = fields.Many2one('res.partner')
-    crm_id = fields.Many2one('crm.lead')
 
     uploader_name = fields.Char(string="Document Name")
     url = fields.Binary(string="Document")

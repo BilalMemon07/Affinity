@@ -1,1 +1,1 @@
-from . import rejection_note_kyc
+# from . import rejection_note_kyc

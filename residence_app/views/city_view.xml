@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+        <data >
+            <!-- res.city form view -->
+            <record id="res_city_view_form" model="ir.ui.view">
+                <field name="name">res.city.view.form</field>
+                <field name="model">res.city</field>
+                <field name="arch" type="xml">
+                    <form string="">
+                        <sheet>
+                            <group>
+                                <field name="name"/>
+                                <field name="region_id"/>                   
+                            </group>
+                        </sheet>
+                    </form>
+                </field>
+            </record>
+            <!-- res.city tree view -->
+            <record id="res_city_view_tree" model="ir.ui.view">
+                <field name="name">res.city.view.tree</field>
+                <field name="model">res.city</field>
+                <field name="arch" type="xml">
+                    <tree>
+                        <!-- Add your fields here -->
+                        <field name="name"/>
+                        <field name="region_id"/>
+                    </tree>
+                </field>
+            </record>
+            <!-- res.city action window -->
+            <record id="res_city_action" model="ir.actions.act_window">
+                <field name="name">Cities</field>
+                <field name="type">ir.actions.act_window</field>
+                <field name="res_model">res.city</field>
+                <field name="view_mode">tree,form</field>
+            </record>
+
+            <!-- This Menu Item must have a parent and an action -->
+            <menuitem id="city_menu_act" name="City" parent="contacts.menu_localisation" action="res_city_action" sequence="10"/>
+        </data>
+</odoo>

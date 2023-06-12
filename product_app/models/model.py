@@ -75,24 +75,24 @@ class Leads(models.Model):
     
     # score fields 
 
-    company_score = fields.Float(String =  "Company Score" ,readonly = True)
-    business_score = fields.Float(String =  "Business Score" ,readonly = True)
-    revenue_score = fields.Float(String =  "Revenue Score" ,readonly = True)
-    years_score = fields.Float(String =  "Years Score" ,readonly = True)
-    customer_score = fields.Float(String =  "Customer Score" ,readonly = True)
-    pep_score = fields.Float(String =  "PEP Score" ,readonly = True)
+    company_score = fields.Float(string =  "Company Score" ,readonly = True)
+    business_score = fields.Float(string =  "Business Score" ,readonly = True)
+    revenue_score = fields.Float(string =  "Revenue Score" ,readonly = True)
+    years_score = fields.Float(string =  "Years Score" ,readonly = True)
+    customer_score = fields.Float(string =  "Customer Score" ,readonly = True)
+    pep_score = fields.Float(string =  "PEP Score" ,readonly = True)
     statement_score = fields.Float(string = "Statement Score" ,readonly = True)
     repayment_score = fields.Float(string = "Repayment Score" ,readonly = True)
     truck_score = fields.Float(string = "Truck Score" ,readonly = True)
 
     # weight fields
 
-    company_weight = fields.Float(String =  "Company weight"  ,readonly = True)
-    business_weight = fields.Float(String =  "Business weight" ,readonly = True)
-    revenue_weight = fields.Float(String =  "Revenue weight" ,readonly = True)
-    years_weight = fields.Float(String =  "Years weight" ,readonly = True)
-    customer_weight = fields.Float(String =  "Customer weight" ,readonly = True)
-    pep_weight = fields.Float(String =  "PEP weight" ,readonly = True)
+    company_weight = fields.Float(string =  "Company weight"  ,readonly = True)
+    business_weight = fields.Float(string =  "Business weight" ,readonly = True)
+    revenue_weight = fields.Float(string =  "Revenue weight" ,readonly = True)
+    years_weight = fields.Float(string =  "Years weight" ,readonly = True)
+    customer_weight = fields.Float(string =  "Customer weight" ,readonly = True)
+    pep_weight = fields.Float(string =  "PEP weight" ,readonly = True)
     statement_weight = fields.Float(string = "Statement weight" ,readonly = True)
     repayment_weight = fields.Float(string = "Repayment weight" ,readonly = True)
     truck_weight = fields.Float(string = "Truck weight" ,readonly = True)
@@ -100,12 +100,12 @@ class Leads(models.Model):
 
     # Weighted Score Fields  
 
-    company_weighted = fields.Float(String =  "Company weighted"  ,readonly = True)
-    business_weighted = fields.Float(String =  "Business weighted" ,readonly = True)
-    revenue_weighted = fields.Float(String =  "Revenue weighted" ,readonly = True)
-    years_weighted = fields.Float(String =  "Years weighted" ,readonly = True)
-    customer_weighted = fields.Float(String =  "Customer weighted" ,readonly = True)
-    pep_weighted = fields.Float(String =  "PEP weighted" ,readonly = True)
+    company_weighted = fields.Float(string =  "Company weighted"  ,readonly = True)
+    business_weighted = fields.Float(string =  "Business weighted" ,readonly = True)
+    revenue_weighted = fields.Float(string =  "Revenue weighted" ,readonly = True)
+    years_weighted = fields.Float(string =  "Years weighted" ,readonly = True)
+    customer_weighted = fields.Float(string =  "Customer weighted" ,readonly = True)
+    pep_weighted = fields.Float(string =  "PEP weighted" ,readonly = True)
     statement_weighted = fields.Float(string = "Statement weighted" ,readonly = True)
     repayment_weighted = fields.Float(string = "Repayment weighted" ,readonly = True)
     truck_weighted = fields.Float(string = "Truck weighted" ,readonly = True)
@@ -143,7 +143,7 @@ class Leads(models.Model):
     business_development_officer = fields.Many2one('hr.employee', string='Business Development Officer' )
     supervising_manager = fields.Many2one('hr.employee', string='Supervising Manager' )
     # new fields
-    region = fields.Selection([('Karachi', 'Karachi'), ('Lahore', 'Lahore'),('Multan', 'Multan'),('Islamabad', 'Islamabad'),('Peshawar', 'Peshawar')], string='Region')
+    region = fields.Many2one('res.region', string='Region')
     
     instrument_lines = fields.One2many('instrument', 'crm_id', string='Instrument Lines')
 
@@ -397,6 +397,11 @@ class Leads(models.Model):
             self['authorized_signatory_details_lines'] = list1
             self['key_personnel_details_lines'] = list2
             self['partner_bank_id'] = list3
+            self['cnic_Front'] = self.partner_id.cnic_front
+            self['CNIC_Back'] = self.partner_id.cnic_back
+            # self['name_CNIC_Back_name'] = self.partner_id.cnic_back_name
+            # self['name_cnic_Front_name'] = self.partner_id.cnic_front_name
+
             # if self['partner_id']['approve_for_BL'] or self['partner_id']['approve_for_DTL']  or self['partner_id']['approve_for_ID']:
             #     self['partner_id']['state'] = 'Revision_Required'
             # else:
@@ -566,7 +571,7 @@ class Leads(models.Model):
                                     'partner_id':self.partner_id.id
                                 })), 
                         obj = {
-                        'name': self.customer_name,
+                        'name': str(self.customer_name) +" - "+ str(self.company_name),
                         'gender': self.gender,
                         'cnic_number':self.cnic_number,
                         'father_name':self.father_name,
@@ -585,7 +590,11 @@ class Leads(models.Model):
                         'company_address':self.company_address,
                         'authorized_signatory_details_lines' : list1,
                         'key_personnel_details_lines': list2,
-                        'bank_ids':list3
+                        'bank_ids':list3,
+                        'cnic_front': self.cnic_Front,
+                        'cnic_back' : self.CNIC_Back,
+                        # 'cnic_back_name': self.name_CNIC_Back_name,
+                        # "cnic_front_name": self.name_cnic_Front_name
                         }
                         # raise UserError(str(obj))
                         partner = self.env['res.partner'].search([('id','=',self.partner_id.id)])
@@ -980,7 +989,7 @@ class Leads(models.Model):
                     ))
                     move = self.env['account.move'].with_context(check_move_validity=False).create({
                     'journal_id': 1,
-                    'invoice_date': datetime.now(),
+                    'invoice_date': rec.facility_request_date,
                     'invoice_date_due': rec.instrument_due_date,
                     'invoice_line_ids':lines,
                     'move_type':'out_invoice',

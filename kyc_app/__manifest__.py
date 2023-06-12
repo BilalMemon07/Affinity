@@ -15,7 +15,7 @@
     'depends': ['base','crm','residence_app', 'product_app'],
     'data': [
         'security/ir.model.access.csv',
-        'wizards/rejection_note_kyc.xml',
+        # 'wizards/rejection_note_kyc.xml',
         'views/views.xml',
     ],
     'license': 'AGPL-3',
@@ -25,3 +25,4 @@
     'auto_install': False,
     'sequence': '-100',
 }
+# access_rejection_note_kyc,access_rejection_note_kyc,model_rejection_note_kyc,,1,1,1,1

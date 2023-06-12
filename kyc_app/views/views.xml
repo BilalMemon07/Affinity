@@ -8,7 +8,7 @@
 			<field name="arch" type="xml">
 				<xpath expr="/form/sheet" position="before">
 					<header>
-						<field name="state" widget="statusbar" statusbar_visible="Idle,Revision_Required,approve,"/>
+						<field name="state" widget="statusbar" statusbar_visible="Idle,Revision_Required,approve"/>
 						<button name="approve_action" states="Idle,Revision_Required" string="Approve" type="object"/>						
 						<button name="revision_action" states="approve" string="Revision" type="object"/>						
 					</header>
@@ -108,8 +108,10 @@
 					<page name="digital_doc" string="Digital Document">
 						<group>
 							<group>
-								<field name="cnic_front" widget="image" string="CNIC Front" />
-								<field name="cnic_back" widget="image" string="CNIC Back" />
+								<field name="cnic_front_name"  string="CNIC Front" />
+								<field name="cnic_front"  filename="cnic_front_name" string="CNIC Front" />
+								<field name="cnic_back_name"  string="CNIC Back" />
+								<field name="cnic_back" filename="cnic_back_name" string="CNIC Back" />
 							</group>
 							<group>
 								<field name="customer_image" widget="image" string="customer_image" />
