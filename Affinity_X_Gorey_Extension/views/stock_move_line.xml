@@ -1,0 +1,20 @@
+<odoo>
+    <data> 
+      <record id="stock_picking_inherited_form" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit</field>
+        <field name="model">stock.move.line</field>
+        <!-- <field name="inherit_id" ref="stock.view_picking_form"/> -->
+        <field name="inherit_id" ref="stock.view_stock_move_line_detailed_operation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree[1]/field[@name='qty_done']" position="before">
+                <field name="reserved_in_ctn"/>
+            </xpath>  
+            <xpath expr="//tree[1]/field[@name='qty_done']" position="after">
+                <field name="done_in_ctn" />
+                <field name="operation_type_code" invisible="1"/>
+            </xpath>
+        </field>
+      </record>
+
+    </data>
+</odoo>

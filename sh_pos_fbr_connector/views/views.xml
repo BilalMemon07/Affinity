@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="pos_config_form_view_inherit">
+        <field name="name">pos.config.form.extended.view</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[4]" position="after">
+                <h2 name="order">FBR Configuration</h2>
+                <div class="row mt16 o_settings_container">
+                    <div id="autocomplete_address" class="col-xs-12 col-md-6 o_setting_box">
+                        <div class="o_setting_right_pane">
+                            <label for="fbr_authorization"/>
+                            <div class="text-muted">
+                               Add header Authorization for FBR here
+                            </div>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <field name="fbr_authorization"/>
+                        </div>
+						<!-- <div class="o_setting_right_pane">
+                            <label for="salitex_company"/>
+                            <div class="text-muted">
+                            </div>
+                        </div>
+						<div class="o_setting_right_pane">
+                            <field name="salitex_company"/>
+                        </div> -->
+                        <div class="o_setting_right_pane">
+                            <label for="pos_id"/>
+                            <div class="text-muted">
+                            </div>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <field name="pos_id"/>
+                        </div>
+                    </div>
+                </div>
+                <br/>
+            </xpath>
+            
+        </field>
+   </record>
+   
+  	<record id="pos_order_inherit_form_view" model="ir.ui.view">
+		<field name="name">pos.order.inherit.form.view</field>
+		<field name="model">pos.order</field>
+		<field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+		<field name="arch" type="xml">
+			<xpath expr="//notebook/page[@name='extra']" position="after">
+				<page string="FBR">
+					<group>
+						<field name="post_data_fbr" readonly="1"/>
+						<field name="invoice_number" readonly="1"/>
+						<field name="fbr_respone" readonly="1"/>
+					</group>
+				</page>
+			</xpath>
+				
+		</field>
+	</record>
+	 <record id="view_pos_order_filter_inherit" model="ir.ui.view">
+        <field name="name">pos.order.list.select.inherit</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_order_filter"/>
+        <field name="arch" type="xml">
+        
+        	<field name="name" position="after">
+        		<field name="post_data_fbr"/>
+        	</field>
+        	<xpath expr="//filter[@name='posted']" position="after">
+        		<filter string="Failed FBR Request" name="fbr" domain="[('post_data_fbr','=',False)]"/>
+        	</xpath>
+        </field>
+    </record>
+	<record id="product_inherit_form_view" model="ir.ui.view">
+		<field name="name">product.inherit.form.view</field>
+		<field name="model">product.product</field>
+		<field name="inherit_id" ref="product.product_normal_form_view"/>
+		<field name="arch" type="xml">
+				<field name="default_code" position="after">
+					<field name="pct_code"/>
+				</field>
+		</field>
+	</record>	
+	<record id="product_template_inherit_form_view" model="ir.ui.view">
+		<field name="name">product.temaplte.inherit.form.view</field>
+		<field name="model">product.template</field>
+		<field name="inherit_id" ref="product.product_template_only_form_view"/>
+		<field name="arch" type="xml">
+				<field name="default_code" position="after">
+					<field name="pct_code"/>
+				</field>
+		</field>
+	</record>	
+		
+	<record id="res_partner_inherit_form_view" model="ir.ui.view">
+		<field name="name">res_partner_inherit_form_view</field>
+		<field name="model">res.partner</field>
+		<field name="inherit_id" ref="base.view_partner_form"/>
+		<field name="arch" type="xml">
+				<field name="vat" position="after">
+					<field name="cnic"/>
+				</field>
+		</field>
+	</record>
+</odoo>

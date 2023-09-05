@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<!-- <data noupdate="1"> -->
+	<data>
+		 <!--  Multi Action To send Failed FBR Request -->
+         <record id="post_data_to_fbr_action" model="ir.actions.server">
+	         <field name="name">Post Data to FBR</field>
+	         <field name="type">ir.actions.server</field>
+	         <field name="state">code</field>
+	         <field name="model_id" ref="point_of_sale.model_pos_order"/>
+	         <field name="binding_model_id" ref="point_of_sale.model_pos_order"/>
+	         <field name="code">
+				records.post_data_to_fbr_action()
+	         </field>
+	     </record>
+	     
+	     <!--  Cron To send Failed FBR Request -->
+	     <record id="post_data_to_fbr_cron" model="ir.cron">
+	        <field name="name">Post Data to FBR Cron</field>
+	        <field name="active" eval="True"/>
+	        <field name="interval_number">1</field>
+	        <field name="interval_type">days</field>
+	        <field name="numbercall">-1</field>
+	        <field name="doall" eval="False"/>
+	        <field name="model_id" ref="point_of_sale.model_pos_order"/>
+	        <field name="code">model.post_data_to_fbr_cron()</field>
+	        <field name="state">code</field>
+	    </record>
+	     
+	     
+	     
+	</data>
+</odoo>

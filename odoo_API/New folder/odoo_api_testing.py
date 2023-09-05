@@ -137,7 +137,8 @@ def login():
 
 
 
-@app.route(url_prefix + 'createCustomer', methods=['POST'])
+# done create customer lead
+@app.route(url_prefix + 'createCustomerLead', methods=['POST'])
 @jwt_required()
 def createCustomer():
     record = json.loads(request.data)
@@ -145,53 +146,146 @@ def createCustomer():
     try:
         current_user = get_jwt_identity()
         
-        customer_search = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.partner', 'search', [
-            [['phone', '=', record['phone']]]])
-        if customer_search:
-            return Response('User Already Exist, You Can not add This User 2nd Time', status=400, mimetype='application/json')
-        if product_type == "BROKER_LENDING":
-            id = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.partner', 'create', [{
-                "name":record['name'],
-                "gender":record['gender'],
-                "phone": record['phone'],
-                "cnic_number":record['cnic_number'],
-                "father_name":record['father_name'],
-                "cnic_expiry_date":record['cnic_expiry_date'],
-                "date_of_birth":record['date_of_birth'],
-                "birth_place":record['birth_place'],
-                "mailing_address":record['mailing_address'],
-                "permanent_address":record['permanent_address'],
-                "city":record['city'],
-                "province":record['province'],
-                "nature_of_business":record['nature_of_business'],
-                "requestor_income":record['requestor_income'],
-                "no_of_years":record['no_of_years'],
-                "company_name":record['company_name'],
-                "company_address":record['company_address'],
-                "cnic_front":record['cnic_front'],
-                "cnic_back":record['cnic_back'],
-                "security_cheque":record['security_cheque'],
-                "customer_image":record['customer_image'],
-                "product_type":"1"
-            }])
-        else:
-            id = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.partner', 'create', [{
-                "name":record['name'],
-                "phone": record['phone'],
-                "cnic_number":record['cnic_number'],
-                "cnic_expiry_date":record['cnic_expiry_date'],
-                "permanent_address":record['permanent_address'],
-                "region": record['region'],
-                # "city":record['city'],
-                # "province":record['province'],
-                "company_name":record['company_name'],
-                "product_type":"2",
-                'state': record['record']
-            }])
-        print(id)
+        product_info = {}
+        customer_id = False
+        if product_type:
+            if not record['product_info']['partner_id']:
+                customer = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.partner', 'search_read', [
+                                                    [['name', 'like', record['general']['customer_name']]]])
+                # customer_ids = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.partner', 'search_read', [
+                                                    # [['id', 'like', int(record['general']['customer_name'])]]])
+                if customer != []:
+                    customer_id = customer[0]['id']
+            
+                else:
+                    customer_id = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.partner', 'create', [{
+                        "name": record['general']['customer_name'],            
+                    }])
+            # print(customer_id)
+            # return "none"
+            multi_doc = []
+            if record['multi_document'] != []:
+                for multi in record['multi_documents']:
+                    multi_doc.append((0,0,{
+                        'uploder_name':multi['document_name'],
+                        'url' : multi['document'],
+                        'description':multi['description']
+                    })) 
+            if product_type == 'BROKER_LENDING':
+                product_info = {
+                    "name": record['general']['name'],
+                    'product_type':'1',
+                    'partner_id':record['product_info']['partner_id'] or customer_id,
+                    'borrowers_requested_limit': record['product_info']['borrowers_requested_limit'], 
+                    'business_recommended_limit': record['product_info']['business_recommended_limit'],
+                    'recommeded_interest_rate_per_month': record['product_info']['recommeded_interest_rate_per_month'],
+                    'approved_limit': record['product_info']['approved_limit'],
+                    'approved_interest_rate': record['product_info']['approved_interest_rate'],
+                    'team_id':5,
+                    'multi_document_lines':multi_doc
+                }
+            elif product_type == 'DRIVE_THROUGH_LENDING':
+                product_info = {
+                    "name": record['general']['name'],
+                    'product_type':'2',
+                    'partner_id':record['product_info']['partner_id'] or customer_id,
+                    'borrowers_requested_limit': record['product_info']['borrowers_requested_limit'], 
+                    'business_recommended_limit': record['product_info']['business_recommended_limit'],
+                    'recommeded_interest_rate_per_month': record['product_info']['recommeded_interest_rate_per_month'],
+                    'approved_limit': record['product_info']['approved_limit'],
+                    'approved_interest_rate': record['product_info']['approved_interest_rate'],
+                    'team_id':5,
+                    'multi_document_lines':multi_doc
+                }
+            elif product_type == 'INVOICE_DISCOUNTING':
+                product_info = {
+                    "name": record['general']['name'],
+                    'product_type':'3',
+                    'partner_id': record['product_info']['partner_id'] or customer_id,
+                    'borrowers_requested_limit': record['product_info']['borrowers_requested_limit'], 
+                    'business_recommended_limit': record['product_info']['business_recommended_limit'],
+                    'recommeded_interest_rate_per_month': record['product_info']['recommeded_interest_rate_per_month'],
+                    'approved_limit': record['product_info']['approved_limit'],
+                    'approved_interest_rate': record['product_info']['approved_interest_rate'],
+                    'default_under_writing_authority': record['product_info']['default_under_writing_authority'],
+                    'assosiated_corporate': record['product_info']['assosiated_corporate'],
+                    'team_id':5,
+                    'multi_document_lines':multi_doc
+
+                }
+            customer_pipeline = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'crm.lead', 'create', [product_info])
+            
+            city = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.city', 'search_read', [
+                                                [['name', 'like', record['general']['city']]]])
+            city_id = False
+            if city:
+                city_id = city[0]['id']
+            else:
+                city_id = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.city', 'create', [{'name': record['general']['city'] }])
+           
+
+            province = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.province', 'search_read', [
+                                                [['name', 'like', record['general']['province']]]])
+            province_id = False
+            if province:
+                province_id = province[0]['id']
+            else:
+                province_id = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.province', 'create', [{'name': record['general']['province'] }])
+            
+            nature = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.nature', 'search_read', [
+                                                [['name', 'like', record['general']['nature_of_business']]]])
+            nature_id = False
+            if nature:
+                nature_id = nature[0]['id']
+            else:
+                nature_id = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.nature', 'create', [{'name': record['general']['nature_of_business'] }])
+            
+            
+            
+            region = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.region', 'search_read', [
+                                                [['name', 'like', record['general']['region']]]])
+            region_id = False
+            if region:
+                region_id = region[0]['id']
+            else:
+                region_id = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.region', 'create', [{'name': record['general']['region'] }])
+            
+
+            general = {
+                'customer_name' : record['general']['customer_name'] ,
+                'company_name' :record['general']['company_name'],
+                'gender' :record['general']['gender'],
+                'cnic_number': record['general']['cnic_number'],
+                'father_name': record['general']['father_name'],
+                'cnic_expiry_date': record['general']['cnic_expiry_date'],
+                'date_of_birth': record['general']['date_of_birth'],
+                'birth_place': record['general']['birth_place'],
+                'mailing_address': record['general']['mailing_address'],
+                'permanent_address': record['general']['permanent_address'],
+                'city_id': city_id,
+                'province_id' : province_id,
+                'nature_of_business_id': nature_id,
+                'region': region_id,
+                'requestor_income': record['general']['requestor_income'],
+                'no_of_years': record['general']['no_of_years'],
+                'company_address': record['general']['company_address'],
+                'cnic_Front': record['general']['cnic_Front'],
+                'CNIC_Back': record['general']['CNIC_Back'],
+                'ntn_number': record['general']['ntn_number'],
+                'other_sources_of_income': record['general']['other_sources_of_income'],
+                'type':'opportunity'
+            }
+
+            if customer_pipeline:
+                write = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'crm.lead', 'write', [
+                        [customer_pipeline], general])
+                print("update" + str(write))
+                # customer_phone = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.partner', 'write', [[customer_id],])
+
         res_message = {
                 "Message" : "Record created successfully!",
-                "id" : id
+                "id" : customer_pipeline,
+                "customer_id" : customer_id
             }
         return Response(json.dumps(res_message), status=201, mimetype='application/json')
         # return Response('Record created successfully! ', status=201, mimetype='application/json')
@@ -220,8 +314,8 @@ def getCustomerbyID(id):
 
 
 
-#  db_url = request.args.get('db_url')
-#     db_name = request.args.get('db_name')
+# db_url = request.args.get('db_url')
+# db_name = request.args.get('db_name')
 
 @app.route(url_prefix + 'searchLead', methods=['GET'])
 @jwt_required()
@@ -268,9 +362,9 @@ def getLeadbysearch():
         invoice_list = []
         # for abc in _product_type:
         # data = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'crm.lead', 'search_read', [[['partner_id','in',_customer_id],['product_type','in',_product_type],['state','in',_status],['create_date','>=', _requested_date_to]]],{'fields': ['create_date','product_type','state','requested_amount','amount']})
-        record_id = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'crm.lead', 'search', [[['partner_id','in',_customer_id],['product_type','in',_product_type],['state','in',_status],['create_date','>=', _requested_date_to]]])
+        record_id = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'crm.lead', 'search', [[['partner_id','in',_customer_id],['product_type','in',_product_type],['state','in',_status],['create_date','>=', _requested_date_to],['team_id','=', 1]]])
         for rec in record_id:
-            record = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'crm.lead', 'read', [rec],{'fields': ['id', 'amount', 'display_name', 'state','invoice_state','disbursement_state','requested_amount','product_type','facility_request_date','instrument_due_date','create_date','name','partner_id','partner_name','stage_id','won_status','invoice_id','phone']})
+            record = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'crm.lead', 'read', [rec],{'fields': ['id', 'requested_loan_amount','approved_loan_amount','total_receivable_amount', 'display_name', 'state','invoice_state','disbursement_state','product_type','facility_request_date','instrument_due_date','create_date','name','partner_id','partner_name','stage_id','won_status','invoice_id','phone']})
             for reco in record:
                 if reco['invoice_id']:
                     invoice_rec = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'account.move', 'search_read', [[['id','=', reco['invoice_id'][0]]]],{'fields': ['id', 'payment_state', 'crm_id']})
@@ -299,9 +393,18 @@ def getLeadbyProductType(id):
         current_user = get_jwt_identity()
         if not _id:
             return Response('Record Number Must be Required in Url ', status=404, mimetype='application/json')
-       
+        list_data = []
         data = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'crm.lead', 'search_read', [
                                     [['id', '=', _id]]])
+        for reco in data:
+            if reco['invoice_id']:
+                invoice_rec = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'account.move', 'search_read', [[['id','=', reco['invoice_id'][0]]]],{'fields': ['id', 'payment_state', 'crm_id']})
+                for inv in invoice_rec:
+                    if reco['id'] == inv['crm_id'][0]:
+                        print('bilal Testing Here') 
+                        reco['invoice_data'] = inv
+
+            # list_data.append(data)
         return jsonify(data)
         
     except Exception as ex:
@@ -347,19 +450,36 @@ def CreateCRM_product():
     product_type = request.args.get('product_type')
     record = json.loads(request.data)
     try:
+        multi_doc = []
         current_user = get_jwt_identity()
-       
+        region = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.region', 'search_read', [
+                                         [['name', 'like', record['region']]]])
+        region_id = False
+        if region:
+            region_id = region[0]['id']
+        else:
+            region_id = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'res.region', 'create', [{'name': record['general']['region'] }])
+        if record['multi_document'] != []:
+            for multi in record['multi_documents']:
+               multi_doc.append((0,0,{
+                   'uploder_name':multi['document_name'],
+                   'url' : multi['document'],
+                   'description':multi['description']
+               })) 
         if product_type == "BROKER_LENDING":
             id = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'crm.lead', 'create', [{
+                "region":region_id,
+                "team_id":1,
                 "name":record['name'],
                 "partner_id" : record['partner_id'],
                 "product_type":"1",
-                "limit_request":record['limit_request'],
-                "requested_amount":record['requested_amount'],
-                "instrument_number":record['instrument_number'],
+                "requested_loan_amount":record['requested_loan_amount'],
                 "facility_request_date":record['facility_request_date'],
                 "instrument_due_date":record['instrument_due_date'],
-                "attachment" : record['attachment'],
+                "No_of_blts": record['No_of_blts'],
+                "type": "opportunity",
+                "Attach_BLTs": record['attach_BLTs'],
+                "multi_document_lines":multi_doc
             }])
             res_message ={
                 "Message" : "Product Created Successfully",
@@ -368,14 +488,19 @@ def CreateCRM_product():
             return Response(json.dumps(res_message), status=201, mimetype='application/json')
         elif product_type == "DRIVE_THROUGH_LENDING":
             id = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'crm.lead', 'create', [{
+                "region":region_id,
+                "team_id":1,
                 "name":record['name'],
                 "partner_id" : record['partner_id'],
                 "product_type":"2",
-                "requested_amount":record['requested_amount'],
-                "instrument_number":record['instrument_number'],
+                "requested_loan_amount":record['requested_loan_amount'],
                 "facility_request_date":record['facility_request_date'],
                 "instrument_due_date":record['instrument_due_date'],
-                "attachment" : record['attachment'],
+                "No_of_blts": record['No_of_blts'],
+                "type": "opportunity",
+                "Attach_BLTs": record['attach_BLTs'],
+                "multi_document_lines":multi_doc
+
             }])
             res_message = {
                 'Message' : 'Product Created Successfully',
@@ -384,17 +509,22 @@ def CreateCRM_product():
             return Response(json.dumps(res_message), status=201, mimetype='application/json')
         elif product_type == "INVOICE_DISCOUNTING":
             id = models.execute_kw(current_user['db'], uid, current_user['dbpassword'], 'crm.lead', 'create', [{
+                "region":region_id,
+                "team_id":1,
                 "name":record['name'],
                 "partner_id" : record['partner_id'],
                 "product_type":"3",
+                "requested_loan_amount":record['requested_loan_amount'],
                 "facility_request_date":record['facility_request_date'],
-                "instrument_due_date": record['instrument_due_date'],
-                "select_party": record['select_party'],
-                "invoice_amount":record['invoice_amount'],
-                "tag_trip":record['tag_trip'],
-                "invoice_type":record['invoice_type'],
-                "description":record['description'],
-                "invoice_attachment":record['invoice_attachment']
+                "instrument_due_date":record['instrument_due_date'],
+                "No_of_blts": record['No_of_blts'],
+                "invoice_numbr": record['invoice_number'],
+                "attach_invoices": record['attach_invoice'],
+                "Attach_BLTs": record['attach_BLTs'],
+                "type": "opportunity",
+                "Corporate_Customer": record['Corporate_Customer'],
+                "multi_document_lines":multi_doc
+
             }])
             res_message ={
                 "Message" : "Product Created Successfully",

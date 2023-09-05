@@ -1,0 +1,42 @@
+<odoo>
+  <data>
+    <record id="Product_template_inherited_form" model="ir.ui.view">
+        <field name="name">Product.template.form.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+                <!-- <field name="documents" widget="many2many_binary"/> -->
+                  <!-- <field name="attachment_ids" widget="many2many_binary"/> -->
+                <field name="uom_po_id" position="before">
+                    <field name="secondary_uom_id"/>
+                </field>
+        </field>
+    </record>
+    
+    <record id="partner_inherited_form" model="ir.ui.view">
+        <field name="name">partner.form.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+                <!-- <field name="documents" widget="many2many_binary"/> -->
+                  <!-- <field name="attachment_ids" widget="many2many_binary"/> -->
+                <field name="vat" position="after">
+                    <field name="uom_selection"/>
+                </field>
+        </field>
+    </record>
+
+
+
+    <!-- <record id="product_pricelist_view_Inherited_form" model="ir.ui.view">
+        <field name="name">product.pricelist.view.Inherited.form</field>
+        <field name="model">product.pricelist</field>
+        <field name="inherit_id" ref="product.product_pricelist_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/notebook/page[@name='item_ids']/tree/field[@name='fixed_price']" position="after">
+                <field name="ctn_price"/>
+            </xpath>
+        </field>
+    </record> -->
+  </data>
+</odoo>

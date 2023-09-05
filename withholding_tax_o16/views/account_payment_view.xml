@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="account_payment_withholding_tax_view" model="ir.ui.view">
+        <field name="name">account.payment.withholding.tax.view</field>
+        <field name="model">account.payment</field>
+        <field name="inherit_id" ref="account.view_account_payment_form"/>
+        <field name="arch" type="xml">
+            <field name="ref" position="after">
+                <field name="paid_to" force_save="1"/>
+            </field>
+            <xpath expr="/form/sheet/group/group[3]" position="after">
+                <group>
+                    <group string="Withholding Tax">
+                        <field name="tax_code"/>
+                        <field name="tax_account" force_save="1"/>
+                        <field name="tax_perc" force_save="1"/>
+                        <field name="tax_amount" force_save="1"/>
+                        <field name="total_amount" force_save="1"/>
+                    </group>
+                    <group string="Withholding Tax Services">
+                            <field name="amount_to_withhold_service"/>
+                            <field name="tax_code_service"/>
+                            <field name="tax_account_service" force_save="1"/>
+                            <field name="tax_perc_service" force_save="1"/>
+                            <field name="tax_amount_service" force_save="1"/>
+                            <field name="total_amount_service" force_save="1"/>
+                    </group>
+                </group> 
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

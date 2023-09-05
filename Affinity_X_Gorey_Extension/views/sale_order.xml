@@ -1,0 +1,20 @@
+<odoo>
+  <data>
+    <record id="sale_order_inherited_form" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form[1]/sheet[1]/notebook[1]/page[@name='order_lines']/field[@name='order_line']/tree[1]/field[@name='product_uom_qty']" position="after">
+                <!-- <field name="documents" widget="many2many_binary"/> -->
+                  <!-- <field name="attachment_ids" widget="many2many_binary"/> -->
+
+                <field name="delivery_status" 
+                    decoration-success="delivery_status == 'full'"
+                    decoration-info="delivery_status == 'partial'"
+                    decoration-warning="delivery_status == 'pending'"/>
+            </xpath>
+        </field>
+     </record>
+  </data>
+</odoo>
