@@ -1,0 +1,4 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+access_finance_model,access_finance_model,model_finance_model,base.group_user,1,1,1,1
+access_finance_line_model,access_finance_line_model,model_finance_line_model,base.group_user,1,1,1,1
+access_payment_mode,access_payment_mode,model_payment_mode,base.group_user,1,1,1,1

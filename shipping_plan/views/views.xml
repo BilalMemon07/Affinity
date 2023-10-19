@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="stock_picking_inherited_form" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form[1]/header[1]" position="after">
+                <header>
+                	<button name="shipment_next_step" string="Process To Next Step" type="object" class="oe_highlight" attrs="{'invisible': [('picking_type_code', '!=', 'incoming')]}" ></button>
+                  <field name="shipment_status" widget="statusbar" statusbar_visible="shipment_pickedup,tracking_no,arrival_at_airport,shipping_document_submittion_in_bank,shipping_documents_received_at_local_bank,shipping_documents_received_at_shibli,do_collection,gd_filling_PSID,shipment_clearance" attrs="{'invisible': [('picking_type_code', '!=', 'incoming')]}"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+    
+    
+    <record id="shipment_model_view_form" model="ir.ui.view">
+        <field name="name">shipment.model.view.form</field>
+        <field name="model">shipment.model</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+            
+                    <field name="line_ids">
+                        <tree editable='bottom'>
+                            <field name="Shipment_no" />
+                            <field name="description_of_goods" />
+                            <field name="current_status" />
+                            <field name="qty" />
+                            <field name="shipment_pickedup" />
+                            <field name="tracking_no" />
+                            <field name="arrival_at_airport" />
+                            <field name="shipping_document_submittion_in_bank" />
+                            <field name="shipping_documents_received_at_local_bank" />
+                            <field name="shipping_documents_received_at_shibli" />
+                            <field name="do_collection" />
+                            <field name="gd_filling_PSID" />
+                            <field name="shipment_clearance" />
+                            <field name="progress_bar"  widget="progressbar"/>
+                       </tree>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- Action -->
+    <record id="shipment_model_action" model="ir.actions.act_window">
+        <field name="name">Plan</field>
+        <field name="res_model">shipment.model</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- Menu Items -->
+    <menuitem id="shipment_model_menu_action" action="shipment_model_action" web_icon="shipping_plan,static/description/icon.png"/>
+
+</odoo>     

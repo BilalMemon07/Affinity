@@ -4,11 +4,11 @@
 {
     'name': 'Record Expense',
     'version': "1.0.0",
-    'category': 'Expense',
+
+    'author':"Syed Subhan, Bilal Memon",
     'summary': '',
     'description': """""",
-    'sequence': '-100',
-    'depends': ['account'],
+    'depends': ['account','base','sale',],
     'data': [
         'views/record_expense.xml',
         'security/ir.model.access.csv',
@@ -21,3 +21,6 @@
     'auto_install': False,
     'License': 'LGPL-3'
 }
+
+
+

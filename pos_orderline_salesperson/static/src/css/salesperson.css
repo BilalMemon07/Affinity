@@ -1,0 +1,24 @@
+.salesperson-scroll{
+  height: 270px;
+  overflow: auto;
+}
+
+.salesperson {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.salesperson td{
+  text-align: left;
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.salesperson tr:nth-child(even){background-color: #f2f2f2;}
+
+.salesperson tr:hover {background-color: #ddd;}
+
+.orderline-salesperson{
+    padding:0;
+    float:right;
+}

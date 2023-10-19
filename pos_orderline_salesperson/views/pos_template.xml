@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+	<template id="salespersonassets" inherit_id="point_of_sale.assets">
+        <xpath expr="." position="inside">
+            <link rel="stylesheet" href="/pos_orderline_salesperson/static/src/css/salesperson.css"/>
+            <script type="text/javascript" src="/pos_orderline_salesperson/static/src/js/models.js"></script>
+            <script type="text/javascript" src="/pos_orderline_salesperson/static/src/js/orderline.js"></script>
+            <script type="text/javascript" src="/pos_orderline_salesperson/static/src/js/salesperson.js"></script>
+            <script type="text/javascript" src="/pos_orderline_salesperson/static/src/js/salespersonpopup.js"></script>
+        </xpath>
+    </template>
+
+</odoo>

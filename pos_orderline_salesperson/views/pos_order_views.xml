@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<odoo>
+
+	<record id="view_pos_pos_form_inherit" model="ir.ui.view">
+        <field name="name">pos.order.form.inherit</field>
+        <field name="model">pos.order</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_pos_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='fiscal_position_id']" position="after">
+                <field name="allow_orderline_user" invisible="1"/>
+            </xpath>
+
+        	<xpath expr="//field[@name='lines']/tree/field[@name='price_subtotal_incl']" position="after">
+        		<field name="salesperson_id" attrs="{'column_invisible':[('parent.allow_orderline_user','=', False)]}"/>
+        	</xpath>
+        </field>
+    </record>
+
+</odoo>

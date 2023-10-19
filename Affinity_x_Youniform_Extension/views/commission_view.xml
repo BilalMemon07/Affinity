@@ -1,0 +1,100 @@
+<odoo>
+  <!-- product template -->
+  <data>
+    <record id="Product_template_commission_inherited_form" model="ir.ui.view">
+        <field name="name">Product.template.commission.form.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+                <field name="default_code" position="before">
+                    <field name="commission" string="Commission" />
+                </field>
+        </field>
+    </record>
+    <!-- Account_Account -->
+   <record id="view_account_account_commission_form" model="ir.ui.view">
+        <field name="name">account.account.commission.form.view</field>
+        <field name="model">account.account</field>
+        <field name="inherit_id" ref="account.view_account_form" />
+        <field name="arch" type="xml">
+            <field name="account_type" position="after">
+                <field name="discount_account" />
+                <field name="commission_account" />
+            </field>
+        </field>
+    </record>
+    
+
+    <!-- res config -->
+    <record id="res_config_settings_view_form_commission" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.commission</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="10"/>
+        <field name="inherit_id" ref="account.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@data-key='account']/h2[3]" position="before">  
+                <h2>Commission Setting</h2>
+                    <div class="row mt16 o_settings_container" id="affinity_commission_settings">  
+
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <div class="content-group">
+                                    <label for="commission_account_id"/>
+                                    <div class="mt16">
+                                        <field name="commission_account_id" class="o_light_label"/>
+                                    </div>
+                                </div>
+                                <div class="content-group">
+                                    <label for="discount_account_id"/>
+                                    <div class="mt16">
+                                        <field name="discount_account_id" class="o_light_label" />
+                                    </div>
+                                </div>
+                                <div class="content-group">
+                                    <label for="journal_id"/>
+                                    <div class="mt16">
+                                        <field name="journal_id" class="o_light_label" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Account Move -->
+
+     <record id="view_account_invoice_commission_form" model="ir.ui.view">
+            <field name="name">account.invoice.commission.form.view</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                
+                <xpath expr="/form/sheet/div/button[1]" position="before">
+					<button name="open_journal_enrty" type="object" class="oe_stat_button" icon="fa-book" >
+						<div class="o_stat_info">
+							<field name="jv_count" class="o_stat_value" string="Invoice"/>
+							<span class="o_stat_text">Journal Entry</span>
+						</div>
+					</button>
+				</xpath>
+
+                <xpath expr="//group[@class='oe_subtotal_footer oe_right']/field[@name='tax_totals']" position="before">
+                        <field name="total_commission" />
+                </xpath>
+
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='quantity']" position="before">
+                    <field name="commission" />
+                </xpath>
+                
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='price_subtotal']" position="before">
+                    <field name="total_commission"/>
+                </xpath>
+            </field>
+        </record>
+
+  </data>
+
+ 
+</odoo>

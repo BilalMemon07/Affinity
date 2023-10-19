@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="Orderline" t-inherit="point_of_sale.Orderline" t-inherit-mode="extension" owl="1">
+        <xpath expr="//ul[hasclass('info-list')]/t[1]/li" position="inside">
+            <span class="orderline-salesperson" t-if="env.pos.config.allow_orderline_user">
+                <i t-on-click="usericonclick" class="oe_link_icon fa fa-user oe_icon line-salesperson-icon oe_green" t-if="props.line.get_salesperson()" role="img"/>
+
+                <i t-on-click="usericonclick" class="oe_link_icon fa fa-user-plus oe_icon line-salesperson-icon oe_red" t-if="!props.line.get_salesperson()" role="img"/>
+                <t t-esc="props.line.get_salesperson()" />
+
+                <i t-on-click="removesalesperson" class="oe_link_icon fa fa-remove oe_icon oe_red" t-if="props.line.get_salesperson()" role="img"/>
+
+            </span>
+        </xpath>
+    </t>
+
+    <t t-name="OrderlineSalespersonButton" owl="1">
+        <div class='control-button'>
+            <i class="fa fa-list"/> Salesperson
+        </div>
+    </t>
+    
+</templates>

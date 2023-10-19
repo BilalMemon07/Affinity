@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="finance_model_view_form" model="ir.ui.view">
+        <field name="name">finance.model.view.form</field>
+        <field name="model">finance.model</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <header>
+                    <button name="apply_finance_plan" string="Apply" type="object" class="oe_highlight"  ></button>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <div class='container'>
+                    <group>
+                        <field name="from_date" />
+                        <field name="due_date" />                   
+                    </group>
+                    <field name="line_ids">
+                        <form>
+                             <group>
+                                <group>
+                                    <field name="batch" />
+                                    <field name="po_number" />
+                                    <field name="description" />
+                                    <field name="uom_id" />
+                                    <field name="skua" />
+                                    <field name="category_id" />
+                                    <field name="supplier_id" />
+                                    <field name="lead_time_weeks" />
+                                    <field name="currency_id" />
+                                    <field name="unit_price" />
+                                    <field name="price_in_usd" />
+                                    <field name="percentage" />
+                                    <field name="tax_rate" />
+                                    <field name="qty" />
+                                </group>
+                                <group>
+                                    <field name="gross_amount"/>
+                                    <field name="expected_payment_date"/>
+                                    <field name="payment_amount"/>
+                                    <field name="head_of_payment"/>
+                                    <field name="sub_header"/>
+                                    <field name="journal_id"/>
+                                    <field name="payment_mode"/>
+                                    <field name="month"/>
+                                    <field name="week"/>
+                                    <field name="country_id"/>
+                                    <field name="remarks"/>
+                                </group>
+                            </group>
+                        </form>
+                        
+                        <tree>
+                            <field name="batch" />
+                            <field name="po_number" />
+                            <field name="description" />
+                            <field name="uom_id" />
+                            <field name="skua" />
+                            <field name="category_id" />
+                            <field name="supplier_id" />
+                            <field name="lead_time_weeks" />
+                            <field name="currency_id" />
+                            <field name="unit_price" />
+                            <field name="price_in_usd" />
+                            <field name="percentage" />
+                            <field name="tax_rate" />
+                            <field name="qty" />
+                            <field name="gross_amount"/>
+                            <field name="expected_payment_date"/>
+                            <field name="payment_amount"/>
+                            <field name="head_of_payment"/>
+                            <field name="sub_header"/>
+                            <field name="journal_id"/>
+                            <field name="payment_mode"/>
+                            <field name="month"/>
+                            <field name="week"/>
+                            <field name="country_id"/>
+                            <field name="remarks"/>
+                       </tree>
+                    </field>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- Action -->
+    <record id="finance_model_action" model="ir.actions.act_window">
+        <field name="name">Finance Plan</field>
+        <field name="res_model">finance.model</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+
+
+    <!-- <record id="finance_model_view_form" model="ir.ui.view">
+        <field name="name">finance.model.view.form</field>
+        <field name="model">finance.model</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record> -->
+
+    <record id="payment_mode_model_action" model="ir.actions.act_window">
+        <field name="name">Payment Mode</field>
+        <field name="res_model">payment.mode</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+
+
+    <!-- Menu Items -->
+    <menuitem id="finance_model_menu_action" action="finance_model_action" web_icon="shibli_finance_plan,static/description/icon.png"/>
+    <menuitem id="payment_mode_menu_id"  action="payment_mode_model_action" parent="account.root_payment_menu" sequence="30"/>
+
+</odoo>     

@@ -1,0 +1,3 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+access_shipment_model,access_shipment_model,model_shipment_model,base.group_user,1,1,1,1
+access_shipment_line_model,access_shipment_line_model,model_shipment_line_model,base.group_user,1,1,1,1

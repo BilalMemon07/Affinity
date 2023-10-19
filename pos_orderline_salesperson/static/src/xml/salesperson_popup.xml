@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" inherit_id="point_of_sale.template">
+
+    <t t-name="SalesPersonPopup" owl="1">
+        <div role="dialog" class="modal-dialog">
+            <div class="popup popup-text">
+                <header class="title"><t t-esc="props.title || '' " /></header>
+                <t t-if="props.employees">
+                    <div class='salesperson-scroll'>
+                        <table class='salesperson'>
+                            <tbody>
+                                <tr t-on-click="salespersonpopup" class="salesperson-selected" t-foreach="props.employees" t-as="user" t-att-data-value="user['name']" t-att-data-id="user['id']">
+                                    <td>
+                                        <span t-esc="user['name']" />
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+
+                <footer class="footer">
+                    <div class="button cancel" t-on-click="cancel">
+                        Cancel
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </t>
+
+</templates>
